@@ -7,7 +7,8 @@ import traci # Importa la librería traci, que permite comunicar Python con SUMO
 sumoCmd = [
     "sumo-gui",
     "-c",
-    "single-intersection.sumocfg"
+    "single-intersection.sumocfg",
+    "--random"
 ]
 
 traci.start(sumoCmd) # Lanza SUMO usando el comando anterior y establece conexión entre Python y SUMO.
