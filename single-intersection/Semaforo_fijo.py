@@ -66,7 +66,6 @@ for step in range(1000): # Ejecuta 1000 pasos de simulación. Cada paso suele eq
 
     total_north += north
     total_west += west
-
     #print("step:", step, "north:", north,"west:", west)
 
 print("\nTOTAL NORTH:", total_north)
