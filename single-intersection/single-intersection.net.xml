@@ -64,7 +64,7 @@
     </edge>
 
     <tlLogic id="t" type="static" programID="0" offset="0">
-        <phase duration="10" state="GGrr"/>
+        <phase duration="42" state="GGrr"/>
         <phase duration="2"  state="yyrr"/>
         <phase duration="42" state="rrGG"/>
         <phase duration="2"  state="rryy"/>

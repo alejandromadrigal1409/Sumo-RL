@@ -1,22 +1,58 @@
-import traci # Importa la librería traci, que permite comunicar Python con SUMO.
-from funciones import get_estado
+import sumo_rl
+import traci
+from funciones import discretizacion
 
-sumoCmd = [
-    "sumo-gui",
-    "-c",
-    "single-intersection.sumocfg",
-    "--random"
-]
+env = sumo_rl.SumoEnvironment(
+    net_file="single-intersection.net.xml",
+    route_file="single-intersection.rou.xml",
+    use_gui=True,
+    num_seconds=1000
+)
 
-traci.start(sumoCmd) # Lanza SUMO usando el comando anterior y establece conexión entre Python y SUMO.
+obs = env.reset()
 
-current_phase = None
-for step in range(1000): # Ejecuta 1000 pasos de simulación. Cada paso suele equivaler a 1 segundo
-    
-    traci.simulationStep() # Hace avanzar la simulación exactamente un paso.
+ts_id = env.ts_ids[0]
 
-    s = get_estado()
+print("ID del semáforo:", ts_id)
 
-    print(f"step: {step}, estado: {s}")
+# ===== ACCIÓN 0 =====
+print("\n=== Acción 0 ===")
 
-traci.close() # Cierra: la conexión TraCI la simulación SUMO
+actions = {
+    ts_id: 0
+}
+
+for i in range(20):
+
+    # aplicar acción y obtener resultados RL
+    next_obs, reward, done, info = env.step(actions)
+    state = discretizacion(next_obs[ts_id])
+
+    # obtener fase actual del semáforo
+    fase = traci.trafficlight.getRedYellowGreenState(ts_id)
+
+    print(f"\nPaso {i}")
+    print("Fase:", fase)
+    print("Estado:", state)
+    print("Reward:", reward)
+
+# ===== ACCIÓN 1 =====
+print("\n=== Acción 1 ===")
+
+actions = {
+    ts_id: 1
+}
+
+for i in range(20):
+
+    next_obs, reward, done, info = env.step(actions)
+    state = discretizacion(next_obs[ts_id])
+
+    fase = traci.trafficlight.getRedYellowGreenState(ts_id)
+
+    print(f"\nPaso {i}")
+    print("Fase:", fase)
+    print("Estado:", state)
+    print("Reward:", reward)
+
+env.close()
