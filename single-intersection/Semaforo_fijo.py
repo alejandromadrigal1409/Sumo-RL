@@ -1,74 +1,72 @@
-import traci # Importa la librería traci, que permite comunicar Python con SUMO.
+import gymnasium as gym
+import sumo_rl
+import numpy as np
+import matplotlib.pyplot as plt
 
-# equivalente a comando sumo-gui -c single-intersection.sumocfg
-# "sumo-gui" Inicia SUMO con interfaz gráfica.
-# "-c" usa este archivo de configuración "single-intersection.sumocfg"
+# ===== ENVIRONMENT =====
+env = gym.make(
+    'sumo-rl-v0',
+    net_file="single-intersection.net.xml",
+    route_file="single-intersection.rou.xml",
+    use_gui=False,
+    num_seconds=1000
+)
 
-sumoCmd = [
-    "sumo-gui",
-    "-c",
-    "single-intersection.sumocfg",
-    "--random"
-]
+# ===== FIXED-TIME PARAMETERS =====
+GREEN_TIME = 20
 
-traci.start(sumoCmd) # Lanza SUMO usando el comando anterior y establece conexión entre Python y SUMO.
+current_action = 0
+counter = 0
 
-# Variables para guardar el total acumulado de vehículos detectados.
-total_north = 0
-total_west = 0
+# ===== METRICS =====
+reward_history = []
 
-tlsID = "t" # ID del semaforo 
+# ===== RESET =====
+obs, info = env.reset()
 
-current_phase = None
-for step in range(1000): # Ejecuta 1000 pasos de simulación. Cada paso suele equivaler a 1 segundo
+episode_reward = 0
 
-    # Muestra el ID de todos los semaforos en el ambiente 
-    #print(traci.trafficlight.getIDList())
+# ===== SIMULATION =====
+for step in range(1000):
 
-    cycle = step % 130
+    # aplicar acción fija
+    action = current_action
 
-    if cycle < 60:
-        phase = "GGrr"
+    # ejecutar acción
+    next_obs, reward, terminated, truncated, info = env.step(action)
 
-    elif cycle < 65:
-        phase = "yyrr"
+    episode_reward += reward
 
-    elif cycle < 125:
-        phase = "rrGG"
+    counter += 1
 
-    else:
-        phase = "rryy"
+    # cambiar fase después de GREEN_TIME pasos
+    if counter >= GREEN_TIME:
 
-    if phase != current_phase:
-        traci.trafficlight.setRedYellowGreenState(
-            tlsID,
-            phase
-        )
-        current_phase = phase
-    
-    traci.simulationStep() # Hace avanzar la simulación exactamente un paso.
+        # alternar entre 0 y 1
+        current_action = 1 - current_action
 
-    # lectura de sensores. Aquí se leen dos sensores de tipo induction loop. 
-    # Un induction loop es un sensor colocado sobre un carril que detecta vehículos cuando pasan.
-    north = (
-        # getLastStepVehicleNumber(...)  # “¿cuántos vehículos pasaron por este sensor en el último paso de simulación?”
-        # "north0" es el nombre del sensor
-        traci.inductionloop.getLastStepVehicleNumber("north0") 
-        +
-        traci.inductionloop.getLastStepVehicleNumber("north1")
-    )
+        counter = 0
 
-    west = (
-        traci.inductionloop.getLastStepVehicleNumber("west0")
-        +
-        traci.inductionloop.getLastStepVehicleNumber("west1")
-    )
+    # terminar episodio
+    if terminated or truncated:
+        break
 
-    total_north += north
-    total_west += west
-    #print("step:", step, "north:", north,"west:", west)
+reward_history.append(episode_reward)
 
-print("\nTOTAL NORTH:", total_north)
-print("TOTAL WEST:", total_west)
+env.close()
 
-traci.close() # Cierra: la conexión TraCI la simulación SUMO
+# ===== RESULTS =====
+print(f"Total Reward: {episode_reward}")
+
+# ===== PLOT =====
+plt.figure(figsize=(10,5))
+
+plt.plot(reward_history, marker='o')
+
+plt.title("Fixed-Time Traffic Light Reward")
+plt.xlabel("Episode")
+plt.ylabel("Reward")
+
+plt.grid(True)
+
+plt.show()

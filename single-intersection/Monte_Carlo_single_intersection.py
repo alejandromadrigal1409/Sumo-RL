@@ -80,4 +80,10 @@ for episode in range(episodes):
 
 env.close()
 
+import pickle
+
+with open("policy.pkl", "wb") as f:
+    pickle.dump(policy, f)
+
 plot_rewards(reward_history, window=2)
+
