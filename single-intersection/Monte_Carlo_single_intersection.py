@@ -6,7 +6,7 @@ import random
 
 gamma = 0.9
 epsilon = 0.1
-episodes = 5000
+episodes = 100
 
 actions = [0, 1]
 
@@ -24,8 +24,8 @@ Q = {
     (s, a): 0.0 for s in states for a in actions
 }
 
-Returns = {
-    (s, a): [] for s in states for a in actions
+N = {
+    (s, a): 0 for s in states for a in actions
 }
 
 # epsilon greedy policy
@@ -41,6 +41,10 @@ env = gym.make(
     num_seconds=1000
 )
 
+k = 0
+
+reward_history = []
+
 for episode in range(episodes):
 
     # reset environment
@@ -50,6 +54,9 @@ for episode in range(episodes):
     state = discretization(obs)
 
     episode_data = []
+
+    episode_reward = 0
+    
 
     # ===== GENERATE EPISODE =====
     for step in range(1000):
@@ -68,6 +75,8 @@ for episode in range(episodes):
         # discretize next state
         next_state = discretization(next_obs)
 
+        episode_reward += reward
+
         # save transition
         episode_data.append(
             (state, action, reward)
@@ -76,37 +85,96 @@ for episode in range(episodes):
         # move to next state
         state = next_state
 
+
         if done:
-            print("Episode finished")
             break
+    
+    reward_history.append(episode_reward)
 
     # ===== TRACK EPISODE BACK =====
     G = 0
     
     for t in reversed(range(len(episode_data))):
-        state, action, reward = episode_data[t]
+        s, a, r = episode_data[t]
 
-        G = gamma * G + reward
+        G = gamma * G + r
 
-        # Save whole return
-        Returns[(state, action)].append(G)
+        # Incremental average
+        N[(s,a)] += 1
+        Q[(s, a)] += (G - Q[(s, a)]) / N[(s, a)]
 
-        # Update average of returns
-        Q[(state, action)] = np.mean(Returns[(state, action)])
-
+        '''
         # select greedy action
-        q_values = [Q[(state, action)] for action in actions]
+        q_values = [Q[(s, a)] for a in actions]
         max_q = max(q_values)
 
-        best_actions = [action for action in actions if Q[(state, action)] == max_q]
+        best_actions = [a for a in actions if Q[(s, a)] == max_q]
 
         best_action = best_actions[0]
 
-        for action in actions:
-            if action == best_action:
-                policy[(state,action)] = 1 - epsilon + epsilon/len(actions)
+        for a in actions:
+            if a == best_action:
+                policy[(s,a)] = 1 - epsilon + epsilon/len(actions)
             else:
-                policy[(state,action)] = epsilon/len(actions)
+                policy[(s,a)] = epsilon/len(actions)
+        '''
+
+    if k == 3:
+
+        epsilon = max(0.01, epsilon * 0.999)
+
+        for s in states:
+            # select greedy action
+            q_values = [Q[(s, a)] for a in actions]
+            max_q = max(q_values)
+
+            best_actions = [a for a in actions if Q[(s, a)] == max_q]
+
+            best_action = random.choice(best_actions)
+
+            for a in actions:
+                if a == best_action:
+                    policy[(s,a)] = 1 - epsilon + epsilon/len(actions)
+                else:
+                    policy[(s,a)] = epsilon/len(actions)
+            
+        k = 0
+    else:
+        k += 1
+
 
 
 env.close()
+
+
+import matplotlib.pyplot as plt
+
+# ===== MOVING AVERAGE =====
+avg_rewards = []
+
+window = 2
+
+for i in range(len(reward_history)):
+
+    start = max(0, i - window)
+
+    avg = np.mean(reward_history[start:i+1])
+
+    avg_rewards.append(avg)
+
+# ===== PLOT =====
+plt.figure(figsize=(12,6))
+
+plt.plot(reward_history, alpha=0.4, label="Episode Reward")
+
+plt.plot(avg_rewards, linewidth=2, label="Moving Average (100 episodes)")
+
+plt.xlabel("Episodes")
+plt.ylabel("Reward")
+plt.title("Monte Carlo Training Rewards")
+
+plt.legend()
+
+plt.grid(True)
+
+plt.show()
