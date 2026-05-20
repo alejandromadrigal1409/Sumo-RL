@@ -118,35 +118,17 @@ import os
 import matplotlib.pyplot as plt
 
 
-def plot_rewards(reward_history, window=10, save_dir="graphs"):
+def plot_rewards(reward_history, save_dir="graphs"):
 
     # ===== CREATE FOLDER IF IT DOESN'T EXIST =====
     os.makedirs(save_dir, exist_ok=True)
-
-    # ===== MOVING AVERAGE =====
-    avg_rewards = []
-
-    for i in range(len(reward_history)):
-
-        start = max(0, i - window)
-
-        avg = np.mean(reward_history[start:i+1])
-
-        avg_rewards.append(avg)
 
     # ===== PLOT =====
     plt.figure(figsize=(12,6))
 
     plt.plot(
         reward_history,
-        alpha=0.4,
         label="Episode Reward"
-    )
-
-    plt.plot(
-        avg_rewards,
-        linewidth=2,
-        label=f"Moving Average ({window} episodes)"
     )
 
     plt.xlabel("Episodes")

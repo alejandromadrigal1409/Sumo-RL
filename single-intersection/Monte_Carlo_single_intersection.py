@@ -4,10 +4,6 @@ import sumo_rl
 import gymnasium as gym
 import random
 
-gamma = 0.9
-epsilon = 0.1
-episodes = 100
-
 actions = [0, 1]
 
 states = [
@@ -20,70 +16,98 @@ states = [
     for queue_w2e in ["low_queue", "medium_queue", "high_queue"]
 ]
 
-# Q(s,a) Values
-Q = {
-    (s, a): 0.0 for s in states for a in actions
-}
+import yaml
+with open("config.yaml", "r") as f:
+    config = yaml.safe_load(f)
 
-# Counter for incremental average of Q(s,a)
-N = {
-    (s, a): 0 for s in states for a in actions
-}
+gamma = config["gamma"]
+episodes = config["episodes"]
+num_seconds = config["num_seconds"]
+epsilon_start = config["epsilon"]["start"]
+epsilon_min = config["epsilon"]["min"]
+epsilon_decay = config["epsilon"]["decay"]
+seeds = config["seeds"]
+policy_update_interval = config["policy_update_interval"]
+delta_time = config["delta_time"]
 
-# epsilon greedy policy
-policy = {
-    (s, a): 1/len(actions) for s in states for a in actions
-}
+# ====== MAIN CODE =========
+# List to save rewards of EVERY training
+all_training_rewards = []
 
-# creation of environment
-env = gym.make(
-    'sumo-rl-v0',
-    net_file="single-intersection.net.xml",
-    route_file="single-intersection.rou.xml",
-    use_gui=False,
-    num_seconds=1000,
-    out_csv_name="outputs/montecarlo"
-)
+best_reward = -np.inf
+best_policy = None
 
-# Hyperameters
-k = 1 # flag to make policy improvment
-l = 5 # number of episodes before policy improvement
+for seed in seeds:
 
-# List to save the total reward of every episode
-reward_history = []
+    random.seed(seed)
+    np.random.seed(seed)
 
-for episode in range(episodes):
+    # List to save the total reward of every episode on each training
+    training_rewards  = []
 
-    # reset environment
-    obs, info = env.reset()
+    epsilon = 0.1
+    # Q(s,a) Values
+    Q = {(s, a): 0.0 for s in states for a in actions}
 
-    # initial state
-    initial_state = discretization(obs)
-    
-    # ===== GENERATE EPISODE =====
-    episode_data, episode_reward = episode_generator(env, policy, initial_state, actions)
-    
-    reward_history.append(episode_reward)
+    # Counter for incremental average of Q(s,a)
+    N = {(s, a): 0 for s in states for a in actions}
 
-    # ===== POLICY EVALUATION =====
+    # epsilon greedy policy
+    policy = {(s, a): 1/len(actions) for s in states for a in actions}
 
-    Q, N = policy_evaluation(Q, N, gamma, episode_data)
+    # creation of environment
+    env = gym.make(
+        'sumo-rl-v0',
+        net_file="single-intersection.net.xml",
+        route_file="single-intersection.rou.xml",
+        #out_csv_name="outputs/montecarlo", generates .cvs files for each episode
+        delta_time = delta_time,
+        use_gui=False,
+        num_seconds=num_seconds,
+    )
 
-    # ===== POLICY IMPROVEMENT =====
-    if k == l:
-        policy = policy_improvement(states, actions, policy, Q, epsilon)
-        epsilon = max(0.01, epsilon * 0.995) # decreases the value of epsilon every l episodes
-            
-        k = 0
-    else:
-        k += 1
+    for episode in range(episodes):
 
-env.close()
+        # reset environment
+        obs, info = env.reset(seed=seed + episode)
+
+        # initial state
+        initial_state = discretization(obs)
+        
+        # ===== GENERATE EPISODE =====
+        episode_data, episode_reward = episode_generator(env, policy, initial_state, actions)
+        
+        training_rewards.append(episode_reward)
+
+        # ===== POLICY EVALUATION =====
+        Q, N = policy_evaluation(Q, N, gamma, episode_data)
+
+        # ===== POLICY IMPROVEMENT =====
+        if (episode + 1) % policy_update_interval == 0:
+            policy = policy_improvement(states, actions, policy, Q, epsilon)
+            # decreases the value of epsilon every policy_update_interval episodes
+            epsilon = max(
+                epsilon_min, 
+                epsilon_start * epsilon_decay
+            ) 
+                
+    mean_training_reward = np.mean(training_rewards)
+
+    if mean_training_reward > best_reward:
+        best_reward = mean_training_reward
+        best_policy = policy.copy()
+
+    all_training_rewards.append(training_rewards)
+
+
+    env.close()
+
+mean_all_training_rewards = np.mean(all_training_rewards, axis = 0)
 
 import pickle
 
 with open("policy.pkl", "wb") as f:
-    pickle.dump(policy, f)
+    pickle.dump(best_policy, f)
 
-plot_rewards(reward_history, window=2)
+plot_rewards(mean_all_training_rewards)
 
