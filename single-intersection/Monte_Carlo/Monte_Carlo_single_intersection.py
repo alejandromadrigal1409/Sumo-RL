@@ -23,14 +23,20 @@ with open("config.yaml", "r") as f:
 gamma = config["gamma"]
 episodes = config["episodes"]
 num_seconds = config["num_seconds"]
-epsilon_start = config["epsilon"]["start"]
 epsilon_min = config["epsilon"]["min"]
 epsilon_decay = config["epsilon"]["decay"]
-seeds = config["seeds"]
 policy_update_interval = config["policy_update_interval"]
 delta_time = config["delta_time"]
+method = config["method"]
+master_seed = config["master_seed"]
+num_trainings = config["num_trainings"]
 
 # ====== MAIN CODE =========
+
+random.seed(master_seed)
+
+seeds = random.sample(range(1, 100000),num_trainings)
+
 # List to save rewards of EVERY training
 all_training_rewards = []
 
@@ -38,14 +44,13 @@ best_reward = -np.inf
 best_policy = None
 
 for seed in seeds:
-
+    epsilon = config["epsilon"]["start"]
     random.seed(seed)
     np.random.seed(seed)
 
     # List to save the total reward of every episode on each training
     training_rewards  = []
 
-    epsilon = 0.1
     # Q(s,a) Values
     Q = {(s, a): 0.0 for s in states for a in actions}
 
@@ -80,16 +85,16 @@ for seed in seeds:
         training_rewards.append(episode_reward)
 
         # ===== POLICY EVALUATION =====
-        Q, N = policy_evaluation(Q, N, gamma, episode_data)
+        Q, N = policy_evaluation(Q, N, gamma, episode_data, method)
 
         # ===== POLICY IMPROVEMENT =====
         if (episode + 1) % policy_update_interval == 0:
             policy = policy_improvement(states, actions, policy, Q, epsilon)
             # decreases the value of epsilon every policy_update_interval episodes
             epsilon = max(
-                epsilon_min, 
-                epsilon_start * epsilon_decay
-            ) 
+                epsilon_min,
+                epsilon * epsilon_decay
+            )
                 
     mean_training_reward = np.mean(training_rewards)
 
@@ -106,7 +111,9 @@ mean_all_training_rewards = np.mean(all_training_rewards, axis = 0)
 
 save_experiment(
     reward_history=mean_all_training_rewards,
+    all_training_rewards=all_training_rewards,
     best_policy=best_policy,
-    config=config
+    config=config,
+    seeds=seeds
 )
 

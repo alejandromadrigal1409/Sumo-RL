@@ -1,6 +1,3 @@
-import numpy as np
-import sumo_rl
-import gymnasium as gym
 import random
 
 def discretization(obs):
@@ -80,21 +77,32 @@ def episode_generator(env, policy, state, actions):
     
     return episode_data, episode_reward
 
-def policy_evaluation(Q, N, gamma, episode_data):
+def policy_evaluation(Q, N, gamma, episode_data, method):
     # ===== TRACK EPISODE BACK =====
     G = 0
+    visited = set()
     
     for t in reversed(range(len(episode_data))):
         s, a, r = episode_data[t]
 
         G = gamma * G + r
 
-        # Incremental average
-        N[(s,a)] += 1
-        Q[(s, a)] += (G - Q[(s, a)]) / N[(s, a)]
+        if method == "first_visit":
+
+            if (s, a) not in visited:
+
+                visited.add((s, a))
+
+                N[(s,a)] += 1
+                Q[(s,a)] += (G - Q[(s,a)]) / N[(s,a)]
+
+        else:
+
+            N[(s,a)] += 1
+            Q[(s,a)] += (G - Q[(s,a)]) / N[(s,a)]
+
 
     return Q, N
-
 
 def policy_improvement(states, actions, policy, Q, epsilon):
     for s in states:
@@ -122,10 +130,13 @@ import pickle
 
 def save_experiment(
     reward_history,
+    all_training_rewards,
     best_policy,
     config,
-    base_dir="graphs"
+    seeds,
+    base_dir="experiments"
 ):
+    method = "FC" if config["method"] == "first_visit" else "EV"
 
     # ===== CURRENT DATE/TIME =====
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -133,7 +144,7 @@ def save_experiment(
     # ===== CREATE EXPERIMENT FOLDER =====
     save_dir = os.path.join(
         base_dir,
-        f"run_{timestamp}"
+        f"MC_{method}_experiment_{timestamp}"
     )
 
     os.makedirs(save_dir, exist_ok=True)
@@ -158,7 +169,7 @@ def save_experiment(
 
     plot_path = os.path.join(
         save_dir,
-        f"training_rewards_{timestamp}.png"
+        f"MC_{method}_training_rewards_{timestamp}.png"
     )
 
     plt.savefig(
@@ -170,54 +181,47 @@ def save_experiment(
     plt.close()
 
     # =========================================================
-    # ================= SAVE CONFIG FILE ======================
+    # ================= SAVE CONFIG YAML ======================
     # =========================================================
+
+    import yaml
+
+    config_to_save = config.copy()
+
+    config_to_save["generated_seeds"] = seeds
 
     config_path = os.path.join(
         save_dir,
-        "experiment_config.txt"
+        "experiment_config.yaml"
     )
 
     with open(config_path, "w") as f:
-
-        f.write("===== EXPERIMENT CONFIGURATION =====\n\n")
-
-        f.write(f"Date: {timestamp}\n\n")
-
-        f.write(f"Gamma: {config['gamma']}\n")
-        f.write(f"Episodes: {config['episodes']}\n")
-        f.write(f"Num Seconds: {config['num_seconds']}\n")
-        f.write(f"Policy Update Interval: {config['policy_update_interval']}\n\n")
-
-        f.write("===== EPSILON =====\n")
-
-        f.write(f"Start: {config['epsilon']['start']}\n")
-        f.write(f"Min: {config['epsilon']['min']}\n")
-        f.write(f"Decay: {config['epsilon']['decay']}\n\n")
-
-        f.write("===== SEEDS =====\n")
-
-        for seed in config["seeds"]:
-            f.write(f"{seed}\n")
+        yaml.dump(
+            config_to_save,
+            f,
+            sort_keys=False
+        )
 
     # =========================================================
-    # ================= SAVE BEST POLICY ======================
+    # ================= SAVE DATA ======================
     # =========================================================
 
+    # Save policy
     policy_path = os.path.join(
         save_dir,
-        "best_policy.pkl"
+        f"best_policy_{timestamp}.pkl"
     )
 
     with open(policy_path, "wb") as f:
         pickle.dump(best_policy, f)
 
-    # =========================================================
-    # ===================== TERMINAL INFO =====================
-    # =========================================================
+    # Save data of all trainnings
+    all_training_rewards_path = os.path.join(
+        save_dir,
+        f"all_training_rewards_{timestamp}.pkl"
+    )
 
-    print(f"Graph saved in: {plot_path}")
-    print(f"Configuration saved in: {config_path}")
-    print(f"Best policy saved in: {policy_path}")
+    with open(all_training_rewards_path, "wb") as f:
+        pickle.dump(all_training_rewards, f)
     
 

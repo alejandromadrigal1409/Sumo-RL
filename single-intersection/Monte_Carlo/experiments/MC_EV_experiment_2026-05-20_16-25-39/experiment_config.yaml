@@ -1,21 +1,18 @@
-# ===== ENVIRONMENT =====
 num_seconds: 1000
 delta_time: 5
-
-# ===== RL HYPERPARAMETERS =====
 gamma: 0.9
 episodes: 10
 policy_update_interval: 2
-
-# ===== EPSILON =====
 epsilon:
   start: 0.1
   min: 0.01
   decay: 0.995
-
-# ===== TRAINING =====
 master_seed: 34
 num_trainings: 5
-
-# ===== MONTE CARLO =====
-method: "every_visit"
+method: every_visit
+generated_seeds:
+- 69329
+- 46803
+- 76776
+- 3628
+- 30057
