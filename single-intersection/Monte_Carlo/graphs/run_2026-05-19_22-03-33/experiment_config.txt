@@ -1,0 +1,19 @@
+===== EXPERIMENT CONFIGURATION =====
+
+Date: 2026-05-19_22-03-33
+
+Gamma: 0.9
+Episodes: 10
+Num Seconds: 1000
+Policy Update Interval: 2
+
+===== EPSILON =====
+Start: 0.1
+Min: 0.01
+Decay: 0.995
+
+===== SEEDS =====
+24
+61
+77
+34

@@ -114,16 +114,34 @@ def policy_improvement(states, actions, policy, Q, epsilon):
         
     return policy
     
+from datetime import datetime
 import os
 import matplotlib.pyplot as plt
+import pickle
 
 
-def plot_rewards(reward_history, save_dir="graphs"):
+def save_experiment(
+    reward_history,
+    best_policy,
+    config,
+    base_dir="graphs"
+):
 
-    # ===== CREATE FOLDER IF IT DOESN'T EXIST =====
+    # ===== CURRENT DATE/TIME =====
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+    # ===== CREATE EXPERIMENT FOLDER =====
+    save_dir = os.path.join(
+        base_dir,
+        f"run_{timestamp}"
+    )
+
     os.makedirs(save_dir, exist_ok=True)
 
-    # ===== PLOT =====
+    # =========================================================
+    # ===================== SAVE PLOT =========================
+    # =========================================================
+
     plt.figure(figsize=(12,6))
 
     plt.plot(
@@ -136,20 +154,70 @@ def plot_rewards(reward_history, save_dir="graphs"):
     plt.title("Monte Carlo Training Rewards")
 
     plt.legend()
-
     plt.grid(True)
 
-    # ===== SAVE FIGURE =====
-    save_path = os.path.join(
+    plot_path = os.path.join(
         save_dir,
-        "training_rewards.png"
+        f"training_rewards_{timestamp}.png"
     )
 
-    plt.savefig(save_path, dpi=300, bbox_inches="tight")
+    plt.savefig(
+        plot_path,
+        dpi=300,
+        bbox_inches="tight"
+    )
 
-    # ===== CLOSE FIGURE =====
     plt.close()
 
-    print(f"Graph saved in: {save_path}")
+    # =========================================================
+    # ================= SAVE CONFIG FILE ======================
+    # =========================================================
+
+    config_path = os.path.join(
+        save_dir,
+        "experiment_config.txt"
+    )
+
+    with open(config_path, "w") as f:
+
+        f.write("===== EXPERIMENT CONFIGURATION =====\n\n")
+
+        f.write(f"Date: {timestamp}\n\n")
+
+        f.write(f"Gamma: {config['gamma']}\n")
+        f.write(f"Episodes: {config['episodes']}\n")
+        f.write(f"Num Seconds: {config['num_seconds']}\n")
+        f.write(f"Policy Update Interval: {config['policy_update_interval']}\n\n")
+
+        f.write("===== EPSILON =====\n")
+
+        f.write(f"Start: {config['epsilon']['start']}\n")
+        f.write(f"Min: {config['epsilon']['min']}\n")
+        f.write(f"Decay: {config['epsilon']['decay']}\n\n")
+
+        f.write("===== SEEDS =====\n")
+
+        for seed in config["seeds"]:
+            f.write(f"{seed}\n")
+
+    # =========================================================
+    # ================= SAVE BEST POLICY ======================
+    # =========================================================
+
+    policy_path = os.path.join(
+        save_dir,
+        "best_policy.pkl"
+    )
+
+    with open(policy_path, "wb") as f:
+        pickle.dump(best_policy, f)
+
+    # =========================================================
+    # ===================== TERMINAL INFO =====================
+    # =========================================================
+
+    print(f"Graph saved in: {plot_path}")
+    print(f"Configuration saved in: {config_path}")
+    print(f"Best policy saved in: {policy_path}")
     
 

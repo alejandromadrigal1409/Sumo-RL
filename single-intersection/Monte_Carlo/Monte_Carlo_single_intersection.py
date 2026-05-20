@@ -1,5 +1,5 @@
 import numpy as np
-from funciones import discretization, episode_generator, policy_evaluation, policy_improvement, plot_rewards
+from funciones import discretization, episode_generator, policy_evaluation, policy_improvement, save_experiment
 import sumo_rl
 import gymnasium as gym
 import random
@@ -58,8 +58,8 @@ for seed in seeds:
     # creation of environment
     env = gym.make(
         'sumo-rl-v0',
-        net_file="single-intersection.net.xml",
-        route_file="single-intersection.rou.xml",
+        net_file="../single-intersection.net.xml",
+        route_file="../single-intersection.rou.xml",
         #out_csv_name="outputs/montecarlo", generates .cvs files for each episode
         delta_time = delta_time,
         use_gui=False,
@@ -104,10 +104,9 @@ for seed in seeds:
 
 mean_all_training_rewards = np.mean(all_training_rewards, axis = 0)
 
-import pickle
-
-with open("policy.pkl", "wb") as f:
-    pickle.dump(best_policy, f)
-
-plot_rewards(mean_all_training_rewards)
+save_experiment(
+    reward_history=mean_all_training_rewards,
+    best_policy=best_policy,
+    config=config
+)
 
