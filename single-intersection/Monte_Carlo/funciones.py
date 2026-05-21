@@ -71,7 +71,6 @@ def episode_generator(env, policy, state, actions):
         # move to next state
         state = next_state
 
-
         if done:
             break
     
