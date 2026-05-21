@@ -192,7 +192,7 @@ def save_experiment(
 
     config_path = os.path.join(
         save_dir,
-        "experiment_config.yaml"
+        f"MC_{method}_experiment_config_{timestamp}.yaml"
     )
 
     with open(config_path, "w") as f:
