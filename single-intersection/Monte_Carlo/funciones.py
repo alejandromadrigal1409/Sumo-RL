@@ -135,7 +135,7 @@ def save_experiment(
     seeds,
     base_dir="experiments"
 ):
-    method = "FC" if config["method"] == "first_visit" else "EV"
+    method = "FV" if config["method"] == "first_visit" else "EV"
 
     # ===== CURRENT DATE/TIME =====
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
