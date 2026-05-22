@@ -8,21 +8,24 @@ actions = [0, 1]
 # policy 
 import pickle
 
-with open("experiments/MC_EV_experiment_2026-05-20_19-00-47/best_policy_2026-05-20_19-00-47.pkl", "rb") as f:
+policy_path = "experiments/MC_FC_experiment_2026-05-22_00-03-50/best_policy_2026-05-22_00-03-50.pkl"
+with open(policy_path, "rb") as f:
     policy = pickle.load(f)
+
+time_ID = policy_path[-23:-4]
 
 # creation of environment
 env = gym.make(
     'sumo-rl-v0',
     net_file="../single-intersection.net.xml",
     route_file="../single-intersection.rou.xml",
-    out_csv_name="outputs/montecarlo", #generates .cvs files for each episode
+    out_csv_name=f"outputs/{time_ID}/montecarlo", #generates .cvs files for each episode
     delta_time = 5,
     use_gui=False,
     num_seconds=1000,
 )
 
-master_seed = 84
+master_seed = 57
 episodes = 10
 
 random.seed(master_seed)
@@ -72,9 +75,11 @@ subprocess.run(
         "python",
         f"{home}/sumo-rl/outputs/plot.py",
         "-f",
-        f"{home}/sumo-rl/proyecto/single-intersection/Monte_Carlo/outputs/montecarlo_conn0_ep",
+        f"{home}/sumo-rl/proyecto/single-intersection/Monte_Carlo/outputs/{time_ID}/montecarlo_conn0_ep",
         "--method",
-        "RL"
+        "RL",
+        "--time_ID",
+        f"{time_ID}"
     ],
     check=True
 )
@@ -88,13 +93,13 @@ env = gym.make(
     'sumo-rl-v0',
     net_file="../single-intersection.net.xml",
     route_file="../single-intersection.rou.xml",
-    out_csv_name="outputs/fix", #generates .cvs files for each episode
+    out_csv_name=f"outputs/{time_ID}/fix", #generates .cvs files for each episode
     delta_time = 5,
     use_gui=False,
     num_seconds=1000,
 )
 
-GREEN_TIME = 20
+GREEN_TIME = 6
 
 
 for seed in seeds:
@@ -129,9 +134,11 @@ subprocess.run(
         "python",
         f"{home}/sumo-rl/outputs/plot.py",
         "-f",
-        f"{home}/sumo-rl/proyecto/single-intersection/Monte_Carlo/outputs/fix_conn1_ep",
+        f"{home}/sumo-rl/proyecto/single-intersection/Monte_Carlo/outputs/{time_ID}/fix_conn1_ep",
         "--method",
-        "FIX"
+        "FIX",
+        "--time_ID",
+        f"{time_ID}"
     ],
     check=True
 )
