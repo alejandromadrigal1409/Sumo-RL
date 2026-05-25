@@ -1,0 +1,23 @@
+num_seconds: 1000
+delta_time: 5
+gamma: 0.9
+episodes: 100
+policy_update_interval: 4
+epsilon:
+  start: 0.1
+  min: 0.01
+  decay: 0.99
+master_seed: 34
+num_trainings: 10
+method: every_visit
+generated_seeds:
+- 69329
+- 46803
+- 76776
+- 3628
+- 30057
+- 3921
+- 50995
+- 47802
+- 8464
+- 55585
