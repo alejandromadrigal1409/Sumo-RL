@@ -1,5 +1,5 @@
 import numpy as np
-from funciones import discretization, episode_generator, policy_evaluation, policy_improvement, save_experiment
+from funciones import discretization, train_episode_qlearning, save_experiment
 import sumo_rl
 import gymnasium as gym
 import random
@@ -25,7 +25,7 @@ episodes = config["episodes"]
 num_seconds = config["num_seconds"]
 epsilon_min = config["epsilon"]["min"]
 epsilon_decay = config["epsilon"]["decay"]
-policy_update_interval = config["policy_update_interval"]
+epsilon_update_interval = config["epsilon_update_interval"]
 delta_time = config["delta_time"]
 method = config["method"]
 master_seed = config["master_seed"]
@@ -55,12 +55,6 @@ for seed in seeds:
     # Q(s,a) Values
     Q = {(s, a): 0.0 for s in states for a in actions}
 
-    # Counter for incremental average of Q(s,a)
-    N = {(s, a): 0 for s in states for a in actions}
-
-    # epsilon greedy policy
-    policy = {(s, a): 1/len(actions) for s in states for a in actions}
-
     # creation of environment
     env = gym.make(
         'sumo-rl-v0',
@@ -81,29 +75,25 @@ for seed in seeds:
         initial_state = discretization(obs)
         
         # ===== GENERATE EPISODE =====
-        Q = episode_generator(env, initial_state, actions, gamma, alpha, Q)
+        Q, episode_reward = train_episode_qlearning(env, initial_state, actions, gamma, alpha, Q, epsilon)
         
         training_rewards.append(episode_reward)
 
-        # ===== POLICY EVALUATION =====
-        Q, N = policy_evaluation(Q, N, gamma, episode_data, method)
+        # ===== UPDATE EPSILON =====
+        if (episode + 1) % epsilon_update_interval == 0:
+            # decreases the value of epsilon every epsilon_update_interval episodes
+            epsilon = max(epsilon_min, epsilon * epsilon_decay)
 
-        # ===== POLICY IMPROVEMENT =====
-        if (episode + 1) % policy_update_interval == 0:
-            policy = policy_improvement(states, actions, policy, Q, epsilon)
-            # decreases the value of epsilon every policy_update_interval episodes
-            epsilon = max(
-                epsilon_min,
-                epsilon * epsilon_decay
-            )
-                
+    '''
+    # SEARCH FOR BEST POLICY        
     mean_training_reward = np.mean(training_rewards)
-
+    
     if mean_training_reward > best_reward:
         best_reward = mean_training_reward
         best_policy = policy.copy()
-
+    '''
     all_training_rewards.append(training_rewards)
+    
 
 
     env.close()

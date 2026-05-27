@@ -5,7 +5,8 @@ delta_time: 5
 # ===== RL HYPERPARAMETERS =====
 gamma: 0.9
 episodes: 100
-policy_update_interval: 4
+epsilon_update_interval: 4
+alpha: 0.1
 
 # ===== EPSILON =====
 epsilon:
@@ -15,7 +16,7 @@ epsilon:
 
 # ===== TRAINING =====
 master_seed: 34
-num_trainings: 10
+num_trainings: 8
 
-# ===== MONTE CARLO =====
-method: "first_visit"
+# ===== TEMPORSAL DIFFERENCE =====
+method: "QL"

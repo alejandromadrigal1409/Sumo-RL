@@ -45,7 +45,7 @@ def discretization(obs):
     )
 
 def choose_action(state, epsilon, actions, Q):
-    if random.random < epsilon:
+    if random.random() < epsilon:
         return random.choice(actions)
      
     q_vals = [Q[(state,a)] for a in actions]
@@ -54,13 +54,12 @@ def choose_action(state, epsilon, actions, Q):
     best_actions = [act for act in actions if Q[(state, act)] == q_max]
     return random.choice(best_actions)
 
-def episode_generator(env, state, actions, gamma, alpha, Q):
-    episode_data = []
+def train_episode_qlearning(env, state, actions, gamma, alpha, Q, epsilon):
     episode_reward = 0
     while True:
 
         # select action
-        action = choose_action(state)
+        action = choose_action(state, epsilon, actions, Q)
           
         # execute action
         next_obs, reward, terminated, truncated, info = env.step(action)
@@ -73,9 +72,6 @@ def episode_generator(env, state, actions, gamma, alpha, Q):
 
         episode_reward += reward
 
-        # save transition
-        episode_data.append((state, action, reward))
-
         max_q = max(Q[(next_state, act)] for act in actions)
 
         Q[(state, action)] += alpha * (reward + (gamma * max_q) - Q[(state, action)])
@@ -86,7 +82,7 @@ def episode_generator(env, state, actions, gamma, alpha, Q):
         if done:
             break
     
-    return Q
+    return Q, episode_reward
     
 from datetime import datetime
 import os
@@ -102,7 +98,7 @@ def save_experiment(
     seeds,
     base_dir="experiments"
 ):
-    method = "FV" if config["method"] == "first_visit" else "EV"
+    method = config["method"]
 
     # ===== CURRENT DATE/TIME =====
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -110,7 +106,7 @@ def save_experiment(
     # ===== CREATE EXPERIMENT FOLDER =====
     save_dir = os.path.join(
         base_dir,
-        f"MC_{method}_experiment_{timestamp}"
+        f"{method}_experiment_{timestamp}"
     )
 
     os.makedirs(save_dir, exist_ok=True)
@@ -128,14 +124,14 @@ def save_experiment(
 
     plt.xlabel("Episodes")
     plt.ylabel("Reward")
-    plt.title("Monte Carlo Training Rewards")
+    plt.title("Q-learning Training Rewards")
 
     plt.legend()
     plt.grid(True)
 
     plot_path = os.path.join(
         save_dir,
-        f"MC_{method}_training_rewards_{timestamp}.png"
+        f"{method}_training_rewards_{timestamp}.png"
     )
 
     plt.savefig(
@@ -158,7 +154,7 @@ def save_experiment(
 
     config_path = os.path.join(
         save_dir,
-        f"MC_{method}_experiment_config_{timestamp}.yaml"
+        f"{method}_experiment_config_{timestamp}.yaml"
     )
 
     with open(config_path, "w") as f:
