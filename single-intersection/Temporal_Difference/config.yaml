@@ -4,7 +4,7 @@ delta_time: 5
 
 # ===== RL HYPERPARAMETERS =====
 gamma: 0.9
-episodes: 100
+episodes: 200
 epsilon_update_interval: 4
 alpha: 0.1
 
@@ -16,7 +16,7 @@ epsilon:
 
 # ===== TRAINING =====
 master_seed: 34
-num_trainings: 8
+num_trainings: 10
 
 # ===== TEMPORSAL DIFFERENCE =====
 method: "QL"

@@ -54,12 +54,13 @@ def choose_action(state, epsilon, actions, Q):
     best_actions = [act for act in actions if Q[(state, act)] == q_max]
     return random.choice(best_actions)
 
-def train_episode_qlearning(env, state, actions, gamma, alpha, Q, epsilon):
+def train_episode_td(env, state, actions, gamma, alpha, Q, epsilon, method):
     episode_reward = 0
-    while True:
 
-        # select action
-        action = choose_action(state, epsilon, actions, Q)
+    # select action
+    action = choose_action(state, epsilon, actions, Q)
+    
+    while True:
           
         # execute action
         next_obs, reward, terminated, truncated, info = env.step(action)
@@ -72,12 +73,44 @@ def train_episode_qlearning(env, state, actions, gamma, alpha, Q, epsilon):
 
         episode_reward += reward
 
-        max_q = max(Q[(next_state, act)] for act in actions)
+        if method == "SARSA":
+            next_act = choose_action(next_state, epsilon, actions, Q)
+            Q[(state, action)] += alpha * (reward + (gamma * Q[(next_state, next_act)]) - Q[(state, action)])
 
-        Q[(state, action)] += alpha * (reward + (gamma * max_q) - Q[(state, action)])
+        elif method == "QL":
+            max_q = max(Q[(next_state, act)] for act in actions)
+            Q[(state, action)] += alpha * (reward + (gamma * max_q) - Q[(state, action)])
+            next_act = choose_action(next_state, epsilon, actions, Q)
+            
+        else:
+            max_q = max(Q[(next_state, act)] for act in actions)
+
+            best_actions = [
+                act for act in actions
+                if Q[(next_state, act)] == max_q
+            ]
+
+
+            # Expected value
+            expected_q = 0
+
+            for act in actions:
+
+                if act in best_actions:
+                    prob = ((1 - epsilon) / len(best_actions)) + (epsilon / len(actions))
+                else:
+                    prob = epsilon / len(actions)
+
+                expected_q += prob * Q[(next_state, act)]
+
+            # Qu update
+            Q[(state, action)] += alpha * (reward + (gamma * expected_q) - Q[(state,action)])
+            next_act = choose_action(next_state, epsilon, actions, Q)
+
 
         # move to next state
         state = next_state
+        action = next_act
 
         if done:
             break
@@ -124,7 +157,7 @@ def save_experiment(
 
     plt.xlabel("Episodes")
     plt.ylabel("Reward")
-    plt.title("Q-learning Training Rewards")
+    plt.title(f"{method} Training Rewards")
 
     plt.legend()
     plt.grid(True)
