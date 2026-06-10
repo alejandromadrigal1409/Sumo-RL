@@ -18,4 +18,4 @@ master_seed: 34
 num_trainings: 10
 
 # ===== MONTE CARLO =====
-method: "first_visit"
+method: "every_visit"

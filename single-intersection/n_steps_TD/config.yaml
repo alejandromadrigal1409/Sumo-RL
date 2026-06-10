@@ -7,6 +7,7 @@ gamma: 0.9
 episodes: 100
 epsilon_update_interval: 4
 alpha: 0.1
+n: 4
 
 # ===== EPSILON =====
 epsilon:
@@ -16,7 +17,7 @@ epsilon:
 
 # ===== TRAINING =====
 master_seed: 34
-num_trainings: 10
+num_trainings: 5
 
 # ===== TEMPORSAL DIFFERENCE =====
-method: "E_SARSA"
+method: "tree backup"
