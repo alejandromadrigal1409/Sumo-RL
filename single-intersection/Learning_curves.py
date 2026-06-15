@@ -17,30 +17,30 @@ with open("Temporal_Difference\experiments\QL_experiment_2026-06-02_10-31-56/all
 with open("Temporal_Difference\experiments\E_SARSA_experiment_2026-06-02_14-11-34/all_training_rewards_2026-06-02_14-11-34.pkl", "rb") as f:
     rewards_e_sarsa = pickle.load(f)
 
-
+'''
 plt.plot(
         np.mean(rewards_fv, axis = 0),
         label="MC first visit"
     )
-
+'''
 plt.plot(
         np.mean(rewards_ev, axis = 0),
-        label="MC every visit"
+        label="MC every visit γ = 0.9, ε=0.1"
     )
 
 plt.plot(
         np.mean(rewards_sarsa, axis = 0),
-        label="SARSA"
+        label="SARSA α = 0.1, γ = 0.9, ε=0.1"
     )
 
 plt.plot(
         np.mean(rewards_ql, axis = 0),
-        label="Q-learning"
+        label="Q-learning α = 0.1, γ = 0.9, ε=0.1"
     )
 
 plt.plot(
         np.mean(rewards_e_sarsa, axis = 0),
-        label="E-SARSA"
+        label="E-SARSA α = 0.1, γ = 0.9, ε=0.1"
     )
 
 plt.xlabel("Episodes")

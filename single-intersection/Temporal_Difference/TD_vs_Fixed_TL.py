@@ -3,12 +3,10 @@ import sumo_rl
 import gymnasium as gym
 import random
 
-actions = [0, 1]
-
 # policy 
 import pickle
 
-policy_path = "experiments/MC_FC_experiment_2026-05-22_00-03-50/best_policy_2026-05-22_00-03-50.pkl"
+policy_path = "experiments/E_SARSA_experiment_2026-06-02_14-11-34/best_policy_2026-06-02_14-11-34.pkl"
 with open(policy_path, "rb") as f:
     policy = pickle.load(f)
 
@@ -19,7 +17,7 @@ env = gym.make(
     'sumo-rl-v0',
     net_file="../single-intersection.net.xml",
     route_file="../single-intersection.rou.xml",
-    out_csv_name=f"outputs/{time_ID}/montecarlo", #generates .cvs files for each episode
+    out_csv_name=f"outputs/{time_ID}/TD", #generates .cvs files for each episode
     delta_time = 5,
     use_gui=False,
     num_seconds=1000,
@@ -44,8 +42,8 @@ for seed in seeds:
     while True:
 
         # select action
-        probs = [policy[(state, action)] for action in actions]
-        action = random.choices(actions, weights=probs)[0]
+        #probs = [policy[(state, action)] for action in actions]
+        action = policy[(state)]
             
 
         # execute action
@@ -75,7 +73,7 @@ subprocess.run(
         "python",
         f"{home}/sumo-rl/outputs/plot.py",
         "-f",
-        f"{home}/sumo-rl/proyecto/single-intersection/Monte_Carlo/outputs/{time_ID}/montecarlo_conn0_ep",
+        f"{home}/sumo-rl/proyecto/single-intersection/Temporal_Difference/outputs/{time_ID}/TD_conn0_ep",
         "--method",
         "RL",
         "--time_ID",
@@ -134,7 +132,7 @@ subprocess.run(
         "python",
         f"{home}/sumo-rl/outputs/plot.py",
         "-f",
-        f"{home}/sumo-rl/proyecto/single-intersection/Monte_Carlo/outputs/{time_ID}/fix_conn1_ep",
+        f"{home}/sumo-rl/proyecto/single-intersection/Temporal_Difference/outputs/{time_ID}/fix_conn1_ep",
         "--method",
         "FIX",
         "--time_ID",

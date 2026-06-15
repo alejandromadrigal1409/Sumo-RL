@@ -8,7 +8,7 @@ actions = [0, 1]
 # policy 
 import pickle
 
-policy_path = "experiments/MC_FC_experiment_2026-05-22_00-03-50/best_policy_2026-05-22_00-03-50.pkl"
+policy_path = "experiments/SARSA_experiment_2026-06-01_23-04-36/best_policy_2026-06-01_23-04-36.pkl"
 with open(policy_path, "rb") as f:
     policy = pickle.load(f)
 

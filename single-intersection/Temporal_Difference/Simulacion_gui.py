@@ -8,7 +8,7 @@ actions = [0, 1]
 # policy 
 import pickle
 
-policy_path = "experiments/MC_FC_experiment_2026-05-22_00-03-50/best_policy_2026-05-22_00-03-50.pkl"
+policy_path = "experiments/E_SARSA_experiment_2026-06-02_14-11-34/best_policy_2026-06-02_14-11-34.pkl"
 with open(policy_path, "rb") as f:
     policy = pickle.load(f)
 
@@ -44,8 +44,8 @@ for seed in seeds:
     while True:
 
         # select action
-        probs = [policy[(state, action)] for action in actions]
-        action = random.choices(actions, weights=probs)[0]
+        #probs = [policy[(state, action)] for action in actions]
+        action = policy[(state)]
             
 
         # execute action
@@ -106,3 +106,5 @@ for seed in seeds:
 
         if done:
             break
+
+env.close()
