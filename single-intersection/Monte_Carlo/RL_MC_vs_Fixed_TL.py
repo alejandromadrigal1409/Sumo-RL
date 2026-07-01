@@ -73,7 +73,7 @@ home = os.path.expanduser("~")
 subprocess.run(
     [
         "python",
-        f"{home}/sumo-rl/outputs/plot.py",
+        f"{home}/sumo-rl/proyecto/plot.py",
         "-f",
         f"{home}/sumo-rl/proyecto/single-intersection/Monte_Carlo/outputs/{time_ID}/montecarlo_conn0_ep",
         "--method",

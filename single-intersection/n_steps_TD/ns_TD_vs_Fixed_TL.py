@@ -132,7 +132,7 @@ env.close()
 subprocess.run(
     [
         "python",
-        f"{home}/sumo-rl/outputs/plot.py",
+        f"{home}/sumo-rl/proyecto/plot.py",
         "-f",
         f"{home}/sumo-rl/proyecto/single-intersection/n_steps_TD/outputs/{time_ID}/fix_conn1_ep",
         "--method",
