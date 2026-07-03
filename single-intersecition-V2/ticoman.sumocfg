@@ -1,0 +1,13 @@
+<configuration>
+
+    <input>
+        <net-file value="ticoman.net.xml"/>
+        <route-files value="ticoman.rou.xml"/>
+    </input>
+
+    <time>
+        <begin value="0"/>
+        <end value="3600"/>
+    </time>
+
+</configuration>
