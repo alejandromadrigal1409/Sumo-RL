@@ -2,6 +2,7 @@ import os
 import gymnasium as gym
 import sumo_rl
 import numpy as np
+import statistics
 
 def discretization(obs):
 
@@ -25,15 +26,14 @@ def discretization(obs):
 
         return categorias
 
-    aux = len(obs) // 2
     # ===== DENSITIES =====
-    discreteDensities = categorize(obs[3:aux + 2], "Density")
+    discreteDensities = categorize([statistics.mean(obs[3:6]), statistics.mean(obs[6:9]), statistics.mean(obs[9:12])], "Density")
 
     # ===== QUEUES =====
-    #discreteQueues = categorize(obs[aux + 2:], "Queue")
+    discreteQueues = categorize([statistics.mean(obs[12:15]), statistics.mean(obs[15:18]), statistics.mean(obs[18:21])], "Queue")
 
     # ===== DISCRETE STATE =====
-    return [phase] + [min_green_flag] + discreteDensities # + discreteQueues
+    return tuple([phase] + [min_green_flag] + discreteDensities  + discreteQueues)
     
 
 # --- Rutas a tus archivos (ajusta según tu proyecto) ---
@@ -102,7 +102,6 @@ for step in range(N_STEPS):
         break
 
 prueba = discretization(observation)
-print(type(prueba))
 print(prueba)
 
 env.close()

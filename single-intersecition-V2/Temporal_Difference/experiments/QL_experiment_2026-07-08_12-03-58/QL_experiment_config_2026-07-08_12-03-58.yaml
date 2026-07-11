@@ -1,22 +1,15 @@
-# ===== ENVIRONMENT =====
 num_seconds: 1000
 delta_time: 5
-
-# ===== RL HYPERPARAMETERS =====
 gamma: 0.9
 episodes: 250
 epsilon_update_interval: 4
 alpha: 0.1
-
-# ===== EPSILON =====
 epsilon:
   start: 0.1
   min: 0.01
   decay: 0.99
-
-# ===== TRAINING =====
 master_seed: 34
 num_trainings: 1
-
-# ===== TEMPORSAL DIFFERENCE =====
-method: "QL"
+method: QL
+generated_seeds:
+- 69329

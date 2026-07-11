@@ -17,8 +17,8 @@ queue_levels = ["lowQueue", "mediumQueue", "highQueue"]
 states = list(product(
     phases,
     flags,
-    *([density_levels] * 9)
-    #*([queue_levels] * 9)
+    *([density_levels] * 3),
+    *([queue_levels] * 3)
 ))
 
 import yaml
