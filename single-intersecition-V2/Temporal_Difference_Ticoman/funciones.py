@@ -1,4 +1,5 @@
 import random
+import statistics
 
 def discretization(obs):
 
@@ -9,40 +10,27 @@ def discretization(obs):
     min_green_flag = int(obs[2])
 
     # ===== AUXILIARY FUNCTION =====
-    def categorize(value, category_type):
+    def categorize(array, category_type):
+        categorias = []
 
-        if value < 0.3:
-            return f"low_{category_type}"
+        for valor in array:
+            if valor < 0.3:
+                categorias.append("low" + category_type)
+            elif valor < 0.7:
+                categorias.append("medium" + category_type)
+            else:
+                categorias.append("high" + category_type)
 
-        elif value < 0.7:
-            return f"medium_{category_type}"
-
-        else:
-            return f"high_{category_type}"
+        return categorias
 
     # ===== DENSITIES =====
-    density_n2s = (obs[3] + obs[4]) / 2
-    density_w2e = (obs[5] + obs[6]) / 2
-
-    density_n2s = categorize(density_n2s, "density")
-    density_w2e = categorize(density_w2e, "density")
+    discreteDensities = categorize([statistics.mean(obs[3:6]), statistics.mean(obs[6:9]), statistics.mean(obs[9:12])], "Density")
 
     # ===== QUEUES =====
-    queue_n2s = (obs[7] + obs[8]) / 2
-    queue_w2e = (obs[9] + obs[10]) / 2
-
-    queue_n2s = categorize(queue_n2s, "queue")
-    queue_w2e = categorize(queue_w2e, "queue")
+    discreteQueues = categorize([statistics.mean(obs[12:15]), statistics.mean(obs[15:18]), statistics.mean(obs[18:21])], "Queue")
 
     # ===== DISCRETE STATE =====
-    return (
-        phase,
-        min_green_flag,
-        density_n2s,
-        density_w2e,
-        queue_n2s,
-        queue_w2e
-    )
+    return tuple([phase] + [min_green_flag] + discreteDensities  + discreteQueues)
 
 def choose_action(state, epsilon, actions, Q):
     if random.random() < epsilon:

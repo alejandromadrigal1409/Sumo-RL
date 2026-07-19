@@ -1,8 +1,8 @@
 <configuration>
 
     <input>
-        <net-file value="ticoman.net.xml"/>
-        <route-files value="ticoman.rou.xml"/>
+        <net-file value="ticoman2.net.xml"/>
+        <route-files value="RUTAS2.rou.xml"/>
     </input>
 
     <time>

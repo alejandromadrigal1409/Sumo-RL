@@ -6,15 +6,20 @@ import random
 
 actions = [0, 1]
 
-states = [
-    (phase, flag, den_n2s, den_w2e, queue_n2s, queue_w2e)
-    for phase in ["GGrr", "rrGG"]
-    for flag in [0, 1]
-    for den_n2s in ["low_density", "medium_density", "high_density"]
-    for den_w2e in ["low_density", "medium_density", "high_density"]
-    for queue_n2s in ["low_queue", "medium_queue", "high_queue"]
-    for queue_w2e in ["low_queue", "medium_queue", "high_queue"]
-]
+from itertools import product
+
+phases = ["GGrr", "rrGG"]
+flags = [0, 1]
+
+density_levels = ["lowDensity", "mediumDensity", "highDensity"]
+queue_levels = ["lowQueue", "mediumQueue", "highQueue"]
+
+states = list(product(
+    phases,
+    flags,
+    *([density_levels] * 3),
+    *([queue_levels] * 3)
+))
 
 import yaml
 with open("config.yaml", "r") as f:
@@ -58,8 +63,8 @@ for seed in seeds:
     # creation of environment
     env = gym.make(
         'sumo-rl-v0',
-        net_file="../single-intersection.net.xml",
-        route_file="../single-intersection.rou.xml",
+        net_file="../ticoman2.net.xml",
+        route_file="../RUTAS2.rou.xml",
         #out_csv_name="outputs/montecarlo", generates .cvs files for each episode
         delta_time = delta_time,
         use_gui=False,

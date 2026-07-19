@@ -4,7 +4,7 @@ delta_time: 5
 
 # ===== RL HYPERPARAMETERS =====
 gamma: 0.9
-episodes: 100
+episodes: 250
 epsilon_update_interval: 4
 alpha: 0.1
 
