@@ -1,0 +1,17 @@
+num_seconds: 1000
+delta_time: 5
+gamma: 0.9
+episodes: 35
+epsilon_update_interval: 4
+alpha: 0.1
+epsilon:
+  start: 0.1
+  min: 0.01
+  decay: 0.99
+master_seed: 34
+num_trainings: 3
+method: QL
+generated_seeds:
+- 69329
+- 46803
+- 76776

@@ -1,0 +1,13 @@
+<routes>
+    <route id="route_1" edges="27100883#1.75 27100883#3 27100883#4 27100883#5 27100883#7 27100883#8 27100883#9 27100883#10"/>
+    <route id="route_2" edges="27101068#5 27101068#6 27101068#7 27101068#10 27101068#11 27101068#12"/>
+    <route id="route_3" edges="820009948#0 820009948#1 820009948#2 27101068#6 27101068#7 27101068#10 27101068#11 27101068#12"/>
+    <route id="route_4" edges="820009948#0 820009948#1 820009948#2 -870837818"/>
+    <route id="route_5" edges="820009948#0 820009948#1 820009948#2 27100883#9 27100883#10"/>
+
+    <flow id="flow_1" route="route_1" begin="0" end="100000" probability="0.3" departSpeed="max" departPos="base" departLane="best"/>
+    <flow id="flow_2" route="route_2" begin="0" end="100000" probability="0.3" departSpeed="max" departPos="base" departLane="best"/>
+    <flow id="flow_3" route="route_3" begin="0" end="100000" probability="0.15" departSpeed="max" departPos="base" departLane="best"/>
+    <flow id="flow_4" route="route_4" begin="0" end="100000" probability="0.15" departSpeed="max" departPos="base" departLane="best"/>
+    <flow id="flow_5" route="route_5" begin="0" end="100000" probability="0.15" departSpeed="max" departPos="base" departLane="best"/>
+</routes>

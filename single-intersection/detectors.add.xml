@@ -1,0 +1,31 @@
+<additional>
+
+    <inductionLoop
+        id="north0"
+        lane="t_s_0"
+        pos="10"
+        freq="1"
+        file="detector_output.xml"/>
+
+    <inductionLoop
+        id="north1"
+        lane="t_s_1"
+        pos="10"
+        freq="1"
+        file="detector_output.xml"/>
+
+    <inductionLoop
+        id="west0"
+        lane="t_e_0"
+        pos="10"
+        freq="1"
+        file="detector_output.xml"/>
+
+    <inductionLoop
+        id="west1"
+        lane="t_e_1"
+        pos="10"
+        freq="1"
+        file="detector_output.xml"/>
+
+</additional>
