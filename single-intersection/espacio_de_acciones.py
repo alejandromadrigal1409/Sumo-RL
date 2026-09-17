@@ -1,5 +1,6 @@
 import gymnasium as gym
 import sumo_rl
+import traci
 
 env = gym.make(
     'sumo-rl-v0',
@@ -12,29 +13,44 @@ env = gym.make(
 
 obs, info = env.reset()
 
-print("===== ACTION SPACE =====")
-print("Action space:", env.action_space)
-print("Tipo:", type(env.action_space))
-print("Número de acciones:", env.action_space.n)
-for a in range(env.action_space.n):
-    print(f"  Acción {a}")
-
-print("\n===== OBSERVATION SPACE =====")
-print("Observation space:", env.observation_space)
-print("Shape:", env.observation_space.shape)
-print("Ejemplo de observación (reset):", obs)
-
-# ===== INFO ADICIONAL DEL SEMÁFORO (via el entorno interno) =====
-# env.unwrapped te da acceso al SumoEnvironment real de sumo-rl
 base_env = env.unwrapped
 ts_id = list(base_env.traffic_signals.keys())[0]
 ts = base_env.traffic_signals[ts_id]
 
-print("\n===== DETALLE DEL SEMÁFORO =====")
-print("ID del semáforo:", ts_id)
-print("Fases green disponibles:", ts.num_green_phases)
-print("Fases green (strings de estado):")
-for i, phase in enumerate(ts.all_phases):
-    print(f"  Fase {i}: {phase.state}  (duración base: {phase.duration}s)")
+# Controlled links: índice de link -> lista de (carril_entrada, carril_salida, carril_via)
+controlled_links = traci.trafficlight.getControlledLinks(ts_id)
+
+color_map = {
+    'G': 'VERDE (prioridad)',
+    'g': 'verde (con precaución)',
+    'y': 'AMARILLO',
+    'r': 'ROJO',
+    's': 'stop',
+    'u': 'sin prioridad',
+}
+
+print(f"\n\nNúmero de acciones (fases green): {ts.num_green_phases}")
+print(f"Semáforo: {ts_id}")
+
+for action in range(ts.num_green_phases):
+    phase = ts.green_phases[action]
+    state = phase.state
+    print(f"===== ACCIÓN {action} =====")
+    print(f"Fase resultante: '{state}'  (duración base: {phase.duration}s)\n")
+
+    lane_status = {}
+    for link_index, char in enumerate(state):
+        for (in_lane, out_lane, via) in controlled_links[link_index]:
+            status = color_map.get(char, char)
+            lane_status.setdefault(in_lane, set()).add(status)
+
+    for lane, statuses in lane_status.items():
+        print(f"  Carril '{lane}': {', '.join(statuses)}")
+    print()
+
+for action in range(ts.num_green_phases):
+    phase = ts.green_phases[action]
+    state = phase.state
+    print(phase)
 
 env.close()
