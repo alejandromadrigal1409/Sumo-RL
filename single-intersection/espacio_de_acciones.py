@@ -13,6 +13,8 @@ env = gym.make(
 
 obs, info = env.reset()
 
+
+print("\nStep length (s):", traci.simulation.getDeltaT() / 1000)  # regresa ms, por eso se divide
 base_env = env.unwrapped
 ts_id = list(base_env.traffic_signals.keys())[0]
 ts = base_env.traffic_signals[ts_id]
@@ -47,10 +49,5 @@ for action in range(ts.num_green_phases):
     for lane, statuses in lane_status.items():
         print(f"  Carril '{lane}': {', '.join(statuses)}")
     print()
-
-for action in range(ts.num_green_phases):
-    phase = ts.green_phases[action]
-    state = phase.state
-    print(phase)
 
 env.close()

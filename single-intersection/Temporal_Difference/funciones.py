@@ -9,30 +9,42 @@ def discretization(obs):
     min_green_flag = int(obs[2])
 
     # ===== AUXILIARY FUNCTION =====
-    def categorize(value, category_type):
+    def categorize(value):
 
-        if value < 0.3:
-            return f"low_{category_type}"
-
+        if value < 0.1:
+            return 1
+        elif value < 0.2:
+            return 2
+        elif value < 0.3:
+            return 3
+        elif value < 0.4:
+            return 4
+        elif value < 0.5:
+            return 5
+        elif value < 0.6:
+            return 6
         elif value < 0.7:
-            return f"medium_{category_type}"
-
+            return 7
+        elif value < 0.8:
+            return 8
+        elif value < 0.9:
+            return 9
         else:
-            return f"high_{category_type}"
+            return 10
 
     # ===== DENSITIES =====
     density_n2s = (obs[3] + obs[4]) / 2
     density_w2e = (obs[5] + obs[6]) / 2
 
-    density_n2s = categorize(density_n2s, "density")
-    density_w2e = categorize(density_w2e, "density")
+    density_n2s = categorize(density_n2s)
+    density_w2e = categorize(density_w2e)
 
     # ===== QUEUES =====
     queue_n2s = (obs[7] + obs[8]) / 2
     queue_w2e = (obs[9] + obs[10]) / 2
 
-    queue_n2s = categorize(queue_n2s, "queue")
-    queue_w2e = categorize(queue_w2e, "queue")
+    queue_n2s = categorize(queue_n2s)
+    queue_w2e = categorize(queue_w2e)
 
     # ===== DISCRETE STATE =====
     return (

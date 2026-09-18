@@ -10,10 +10,10 @@ states = [
     (phase, flag, den_n2s, den_w2e, queue_n2s, queue_w2e)
     for phase in ["GGrr", "rrGG"]
     for flag in [0, 1]
-    for den_n2s in ["low_density", "medium_density", "high_density"]
-    for den_w2e in ["low_density", "medium_density", "high_density"]
-    for queue_n2s in ["low_queue", "medium_queue", "high_queue"]
-    for queue_w2e in ["low_queue", "medium_queue", "high_queue"]
+    for den_n2s in range(1,11)
+    for den_w2e in range(1,11)
+    for queue_n2s in range(1,11)
+    for queue_w2e in range(1,11)
 ]
 
 import yaml
@@ -66,7 +66,13 @@ for seed in seeds:
         num_seconds=num_seconds,
     )
 
+    base_env = env.unwrapped
+
     for episode in range(episodes):
+
+        # elige un factor de escala aleatorio para este episodio
+        scale_factor = random.uniform(0.5, 1.5)  # ej: entre 50% y 150% de la demanda base
+        base_env.additional_sumo_cmd = f"--scale {scale_factor}"
 
         # reset environment
         obs, info = env.reset(seed=seed + episode)
