@@ -1,22 +1,24 @@
-# ===== ENVIRONMENT =====
 num_seconds: 1000
 delta_time: 20
-
-# ===== RL HYPERPARAMETERS =====
 gamma: 0.9
 episodes: 1500
 epsilon_update_interval: 4
 alpha: 0.1
-
-# ===== EPSILON =====
 epsilon:
   start: 0.1
   min: 0.01
   decay: 0.99
-
-# ===== TRAINING =====
 master_seed: 34
 num_trainings: 10
-
-# ===== TEMPORSAL DIFFERENCE =====
-method: "E_SARSA"
+method: E_SARSA
+generated_seeds:
+- 69329
+- 46803
+- 76776
+- 3628
+- 30057
+- 3921
+- 50995
+- 47802
+- 8464
+- 55585
