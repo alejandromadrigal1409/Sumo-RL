@@ -1,10 +1,10 @@
 # ===== ENVIRONMENT =====
 num_seconds: 1000
-delta_time: 20
+delta_time: 100
 
 # ===== RL HYPERPARAMETERS =====
 gamma: 0.9
-episodes: 1500
+episodes: 700
 epsilon_update_interval: 4
 alpha: 0.1
 
@@ -16,7 +16,7 @@ epsilon:
 
 # ===== TRAINING =====
 master_seed: 34
-num_trainings: 10
+num_trainings: 30
 
 # ===== TEMPORSAL DIFFERENCE =====
 method: "E_SARSA"
