@@ -1,10 +1,10 @@
 # ===== ENVIRONMENT =====
-num_seconds: 1000
-delta_time: 100
+num_seconds: 2000
+delta_time: 30
 
 # ===== RL HYPERPARAMETERS =====
 gamma: 0.9
-episodes: 700
+episodes: 500
 epsilon_update_interval: 4
 alpha: 0.1
 
