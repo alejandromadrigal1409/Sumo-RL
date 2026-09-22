@@ -1,7 +1,7 @@
 import pickle
 from pprint import pformat
 
-with open("best_policy_2026-09-18_15-06-24.pkl", "rb") as f:
+with open("Temporal_Difference/experiments/E_SARSA_experiment_2026-06-02_14-11-34/best_policy_2026-06-02_14-11-34.pkl", "rb") as f:
     datos = pickle.load(f)
 
 with open("best_policy_contenido.txt", "w", encoding="utf-8") as f:

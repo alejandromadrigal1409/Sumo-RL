@@ -5,9 +5,6 @@ def discretization(obs):
     # ===== PHASE =====
     phase = "GGrr" if obs[0] == 1 else "rrGG"
 
-    # ===== MIN_GREEN FLAG =====
-    min_green_flag = int(obs[2])
-
     # ===== AUXILIARY FUNCTION =====
     def categorize(value):
 
@@ -49,14 +46,16 @@ def discretization(obs):
     # ===== DISCRETE STATE =====
     return (
         phase,
-        min_green_flag,
         density_n2s,
         density_w2e,
         queue_n2s,
         queue_w2e
     )
 
-def choose_action(state, epsilon, actions, Q):
+def choose_action(state, epsilon, actions, Q, min_green_flag, current_phase_action):
+    if min_green_flag == 0:
+        return current_phase_action
+    
     if random.random() < epsilon:
         return random.choice(actions)
      
@@ -66,11 +65,15 @@ def choose_action(state, epsilon, actions, Q):
     best_actions = [act for act in actions if Q[(state, act)] == q_max]
     return random.choice(best_actions)
 
-def train_episode_td(env, state, actions, gamma, alpha, Q, epsilon, method):
+def train_episode_td(env, obs, actions, gamma, alpha, Q, epsilon, method):
     episode_reward = 0
 
+    state = discretization(obs)
+
     # select action
-    action = choose_action(state, epsilon, actions, Q)
+    min_green_flag = int(obs[2])
+    current_phase_action = 0 if obs[0] == 1 else 1
+    action = choose_action(state, epsilon, actions, Q, min_green_flag, current_phase_action)
     
     while True:
           
@@ -83,16 +86,19 @@ def train_episode_td(env, state, actions, gamma, alpha, Q, epsilon, method):
         # discretize next state
         next_state = discretization(next_obs)
 
+        next_min_green_flag = int(next_obs[2])
+        next_current_phase_action = 0 if next_obs[0] == 1 else 1
+
         episode_reward += reward
 
         if method == "SARSA":
-            next_act = choose_action(next_state, epsilon, actions, Q)
+            next_act = choose_action(next_state, epsilon, actions, Q, next_min_green_flag, next_current_phase_action)
             Q[(state, action)] += alpha * (reward + (gamma * Q[(next_state, next_act)]) - Q[(state, action)])
 
         elif method == "QL":
             max_q = max(Q[(next_state, act)] for act in actions)
             Q[(state, action)] += alpha * (reward + (gamma * max_q) - Q[(state, action)])
-            next_act = choose_action(next_state, epsilon, actions, Q)
+            next_act = choose_action(next_state, epsilon, actions, Q, next_min_green_flag, next_current_phase_action)
             
         else:
             max_q = max(Q[(next_state, act)] for act in actions)
@@ -117,7 +123,7 @@ def train_episode_td(env, state, actions, gamma, alpha, Q, epsilon, method):
 
             # Qu update
             Q[(state, action)] += alpha * (reward + (gamma * expected_q) - Q[(state,action)])
-            next_act = choose_action(next_state, epsilon, actions, Q)
+            next_act = choose_action(next_state, epsilon, actions, Q, next_min_green_flag, next_current_phase_action)
 
 
         # move to next state

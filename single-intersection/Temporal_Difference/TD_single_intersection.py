@@ -7,9 +7,8 @@ import random
 actions = [0, 1]
 
 states = [
-    (phase, flag, den_n2s, den_w2e, queue_n2s, queue_w2e)
+    (phase, den_n2s, den_w2e, queue_n2s, queue_w2e)
     for phase in ["GGrr", "rrGG"]
-    for flag in [0, 1]
     for den_n2s in range(1,11)
     for den_w2e in range(1,11)
     for queue_n2s in range(1,11)
@@ -71,14 +70,14 @@ for seed in seeds:
     for episode in range(episodes):
 
         # elige un factor de escala aleatorio para este episodio
-        scale_factor = random.uniform(0.5, 1.5)  # ej: entre 50% y 150% de la demanda base
+        scale_factor = random.uniform(0.1, 1.5)  # ej: entre 50% y 150% de la demanda base
         base_env.additional_sumo_cmd = f"--scale {scale_factor}"
 
         # reset environment
         obs, info = env.reset(seed=seed + episode)
 
         # initial state
-        initial_state = discretization(obs)
+        initial_state = obs
         
         # ===== GENERATE EPISODE =====
         Q, episode_reward = train_episode_td(env, initial_state, actions, gamma, alpha, Q, epsilon, method)
