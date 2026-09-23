@@ -8,26 +8,22 @@ def discretization(obs):
     # ===== AUXILIARY FUNCTION =====
     def categorize(value):
 
-        if value < 0.1:
+        if value < 0.125:
             return 1
-        elif value < 0.2:
+        elif value < 0.25:
             return 2
-        elif value < 0.3:
+        elif value < 0.375:
             return 3
-        elif value < 0.4:
-            return 4
         elif value < 0.5:
+            return 4
+        elif value < 0.625:
             return 5
-        elif value < 0.6:
+        elif value < 0.75:
             return 6
-        elif value < 0.7:
+        elif value < 0.875:
             return 7
-        elif value < 0.8:
-            return 8
-        elif value < 0.9:
-            return 9
         else:
-            return 10
+            return 8
 
     # ===== DENSITIES =====
     density_n2s = (obs[3] + obs[4]) / 2
