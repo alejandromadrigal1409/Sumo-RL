@@ -1,18 +1,3 @@
-"""
-Entorno de Reinforcement Learning para SUMO usando únicamente TraCI.
-
-Requisitos:
-    pip install traci
-    (SUMO debe estar instalado y la variable de entorno SUMO_HOME configurada)
-
-Este ejemplo controla el semáforo de una intersección: en cada paso el agente
-elige una fase de semáforo, la simulación avanza N pasos, y se calcula una
-recompensa en base a la cantidad de vehículos detenidos (esperando) en la red.
-
-Adapta observation_space, action_space, _get_state() y _get_reward() a tu
-propio escenario (.sumocfg, .net.xml, .rou.xml).
-"""
-
 import os
 import sys
 import numpy as np
@@ -21,6 +6,7 @@ import numpy as np
 if "SUMO_HOME" in os.environ:
     tools = os.path.join(os.environ["SUMO_HOME"], "tools")
     sys.path.append(tools)
+    
 else:
     sys.exit("Por favor define la variable de entorno SUMO_HOME")
 
@@ -37,13 +23,13 @@ class SumoEnv:
         tls_id: str,
         use_gui: bool = False,
         sim_steps_per_action: int = 5,
-        max_episode_steps: int = 1000,
+        max_simulation_steps: int = 1000,
     ):
         self.sumocfg_path = sumocfg_path
         self.tls_id = tls_id
         self.use_gui = use_gui
         self.sim_steps_per_action = sim_steps_per_action
-        self.max_episode_steps = max_episode_steps
+        self.max_simulation_steps = max_simulation_steps
 
         self._sumo_binary = "sumo-gui" if use_gui else "sumo"
         self.episode_step = 0
@@ -53,6 +39,7 @@ class SumoEnv:
         self._connect()
         logic = traci.trafficlight.getAllProgramLogics(self.tls_id)[0]
         self.n_phases = len(logic.phases)
+        self.logic = logic.phases
         self._disconnect()
 
         # Espacios (formato tipo gym, sin depender de la librería gym)
@@ -93,7 +80,7 @@ class SumoEnv:
         next_state = self._get_state()
         reward = self._get_reward()
         done = (
-            self.episode_step >= self.max_episode_steps
+            traci.simulation.getTime() >= self.max_simulation_steps
             or traci.simulation.getMinExpectedNumber() <= 0
         )
         info = {}
@@ -128,22 +115,32 @@ if __name__ == "__main__":
     env = SumoEnv(
         sumocfg_path="single-intersection.sumocfg",  # <-- cambia esto por tu archivo
         tls_id="t",              # <-- cambia esto por el id real
-        use_gui=False,
+        use_gui=True,
         sim_steps_per_action=5,
-        max_episode_steps=200,
+        max_simulation_steps=800,
     )
 
-    n_episodes = 3
+    n_episodes = 1
     for ep in range(n_episodes):
         state = env.reset()
         done = False
         total_reward = 0.0
 
+        for fase in env.logic:
+            print(f"\n{fase}")
+
+        print()
+        lanes = traci.trafficlight.getControlledLanes("t")
+        lanes = list(dict.fromkeys(lanes))
+        print(lanes)
+
         while not done:
             action = np.random.randint(env.action_space_n)  # política aleatoria
             state, reward, done, info = env.step(action)
+            simulation_time = traci.simulation.getTime()
+            print(f"Tiempo: {simulation_time:.1f} s |   Estado: {state}")
             total_reward += reward
 
-        print(f"Episodio {ep + 1}: recompensa total = {total_reward:.2f}")
+        print(f" Episodio {ep + 1}: recompensa total = {total_reward:.2f}")
 
     env.close()
