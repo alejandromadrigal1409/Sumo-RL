@@ -6,9 +6,10 @@ import random
 
 actions = [0, 1]
 
+
 states = [
-    (den_n2s, den_w2e, queue_n2s, queue_w2e)
-    #for phase in ["GGrr", "rrGG"]
+    (phase, den_n2s, den_w2e, queue_n2s, queue_w2e)
+    for phase in ["GGrr", "rrGG"]
     for den_n2s in range(1,9)
     for den_w2e in range(1,9)
     for queue_n2s in range(1,9)
@@ -43,6 +44,8 @@ all_training_rewards = []
 best_reward = -np.inf
 best_Q = None
 
+from collections import defaultdict
+
 for seed in seeds:
     epsilon = config["epsilon"]["start"]
     random.seed(seed)
@@ -52,7 +55,9 @@ for seed in seeds:
     training_rewards  = []
 
     # Q(s,a) Values
-    Q = {(s, a): 0.0 for s in states for a in actions}
+    #Q = {(s, a): 0.0 for s in states for a in actions}
+
+    Q = defaultdict(float) 
 
     # creation of environment
     env = gym.make(

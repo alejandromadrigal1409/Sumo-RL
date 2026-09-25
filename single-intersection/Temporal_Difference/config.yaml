@@ -16,7 +16,7 @@ epsilon:
 
 # ===== TRAINING =====
 master_seed: 34
-num_trainings: 3
+num_trainings: 20
 
 # ===== TEMPORSAL DIFFERENCE =====
 method: "E_SARSA"

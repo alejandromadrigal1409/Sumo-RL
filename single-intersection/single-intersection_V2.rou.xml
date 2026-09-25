@@ -4,8 +4,8 @@
     <route id="route_v1" edges="E2 n_t.100 t_s"/>
     <route id="route_v2" edges="E1 w_t.100 t_e"/>
 
-    <flow id="flow_ns" route="route_ns" begin="0" end="100000" probability="0.4" departSpeed="max" departPos="base" departLane="best"/>
-    <flow id="flow_we" route="route_we" begin="0" end="100000" probability="0.3" departSpeed="max" departPos="base" departLane="best"/>
-    <flow id="flow_v1" route="route_v1" begin="0" end="100000" probability="0.1" departSpeed="max" departPos="base" departLane="best"/>
-    <flow id="flow_v2" route="route_v2" begin="0" end="100000" probability="0.2" departSpeed="max" departPos="base" departLane="best"/>
+    <flow id="flow_ns" route="route_ns" begin="0" end="100000" probability="0.2" departSpeed="max" departPos="base" departLane="best"/>
+    <flow id="flow_we" route="route_we" begin="0" end="100000" probability="0.15" departSpeed="max" departPos="base" departLane="best"/>
+    <flow id="flow_v1" route="route_v1" begin="0" end="100000" probability="0.05" departSpeed="max" departPos="base" departLane="best"/>
+    <flow id="flow_v2" route="route_v2" begin="0" end="100000" probability="0.1" departSpeed="max" departPos="base" departLane="best"/>
 </routes>

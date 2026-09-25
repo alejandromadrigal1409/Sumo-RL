@@ -4,7 +4,7 @@ import traci
 def discretization(obs):
 
     # ===== PHASE =====
-    #phase = "GGrr" if obs[0] == 1 else "rrGG"
+    phase = "GGrr" if obs[0] == 1 else "rrGG"
 
     # ===== AUXILIARY FUNCTION =====
     def categorize(value):
@@ -42,7 +42,7 @@ def discretization(obs):
 
     # ===== DISCRETE STATE =====
     return (
-        #phase,
+        phase,
         density_n2s,
         density_w2e,
         queue_n2s,
