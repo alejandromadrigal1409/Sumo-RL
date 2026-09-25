@@ -1,5 +1,5 @@
 import numpy as np
-from funciones import discretization, train_episode_td, save_experiment
+from funciones import train_episode_td, save_experiment
 import sumo_rl
 import gymnasium as gym
 import random
@@ -57,8 +57,8 @@ for seed in seeds:
     # creation of environment
     env = gym.make(
         'sumo-rl-v0',
-        net_file="../single-intersection.net.xml",
-        route_file="../single-intersection.rou.xml",
+        net_file="../single-intersection_V2.net.xml",
+        route_file="../single-intersection_V2.rou.xml",
         #out_csv_name="outputs/montecarlo", generates .cvs files for each episode
         delta_time = delta_time,
         use_gui=False,

@@ -1,7 +1,7 @@
 import pickle
 from pprint import pformat
 
-with open("Temporal_Difference/experiments/E_SARSA_experiment_2026-09-22_22-48-56/best_policy_2026-09-22_22-48-56.pkl", 
+with open("Temporal_Difference/experiments/E_SARSA_experiment_2026-09-24_23-20-13/best_policy_2026-09-24_23-20-13.pkl", 
           "rb") as f:
     datos = pickle.load(f)
 
@@ -11,3 +11,7 @@ with open("best_policy_contenido.txt", "w", encoding="utf-8") as f:
         f.write(f"ESTADO:\n{pformat(estado, width=120)}\n")
         f.write(f"ACCION:\n{pformat(accion, width=120)}\n")
         f.write("\n")
+
+
+
+

@@ -1,4 +1,5 @@
 import random
+import traci
 
 def discretization(obs):
 
@@ -64,6 +65,8 @@ def choose_action(state, epsilon, actions, Q, min_green_flag, current_phase_acti
 def train_episode_td(env, obs, actions, gamma, alpha, Q, epsilon, method):
     episode_reward = 0
 
+    #print(traci.lane.getIDList())
+
     state = discretization(obs)
 
     # select action
@@ -75,6 +78,14 @@ def train_episode_td(env, obs, actions, gamma, alpha, Q, epsilon, method):
           
         # execute action
         next_obs, reward, terminated, truncated, info = env.step(action)
+
+        ############
+        #n_vehiculos = traci.lane.getLastStepVehicleNumber("n_t.100_0")
+        #capacidad = traci.lane.getLength("n_t.100_0") / 7
+        #auxlane = min(1.0, n_vehiculos / capacidad)
+    
+        #print(f"{obs}    |   {auxlane}")
+        ###########
 
         # episode finished?
         done = terminated or truncated
