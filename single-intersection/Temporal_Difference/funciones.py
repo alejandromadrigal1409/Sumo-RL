@@ -73,6 +73,9 @@ def train_episode_td(env, obs, actions, gamma, alpha, Q, epsilon, method):
     min_green_flag = int(obs[2])
     current_phase_action = 0 if obs[0] == 1 else 1
     action = choose_action(state, epsilon, actions, Q, min_green_flag, current_phase_action)
+
+    lane_id = "n_t.100_0"
+    MIN_GAP = 2.5
     
     while True:
           
@@ -85,7 +88,17 @@ def train_episode_td(env, obs, actions, gamma, alpha, Q, epsilon, method):
         #auxlane = min(1.0, n_vehiculos / capacidad)
     
         #print(f"{obs}    |   {auxlane}")
+
+        vehicle_size_min_gap = traci.lane.getLastStepLength(lane_id) + MIN_GAP
+        lane_length = traci.lane.getLength(lane_id)
+
+        density = traci.lane.getLastStepVehicleNumber(lane_id) / (lane_length / vehicle_size_min_gap)
+        queu = traci.lane.getLastStepHaltingNumber(lane_id) / (lane_length / vehicle_size_min_gap)
+
+        print(f"{obs}    |   {density}     |       {queu}")
+
         ###########
+
 
         # episode finished?
         done = terminated or truncated
