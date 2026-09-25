@@ -65,40 +65,39 @@ def choose_action(state, epsilon, actions, Q, min_green_flag, current_phase_acti
 def train_episode_td(env, obs, actions, gamma, alpha, Q, epsilon, method):
     episode_reward = 0
 
-    #print(traci.lane.getIDList())
-
     state = discretization(obs)
 
     # select action
     min_green_flag = int(obs[2])
     current_phase_action = 0 if obs[0] == 1 else 1
     action = choose_action(state, epsilon, actions, Q, min_green_flag, current_phase_action)
+    '''
+    ###################
+    base_env = env.unwrapped if hasattr(env, "unwrapped") else env
+    ts = base_env.traffic_signals[base_env.ts_ids[0]]
 
-    lane_id = "n_t.100_0"
+    lane_1_id = "E1_0"
+    lane_2_id = "E2_0"
+    idx = ts.lanes.index(lane_1_id)
     MIN_GAP = 2.5
-    
+    ########################
+    '''
     while True:
           
         # execute action
         next_obs, reward, terminated, truncated, info = env.step(action)
-
+        '''
         ############
-        #n_vehiculos = traci.lane.getLastStepVehicleNumber("n_t.100_0")
-        #capacidad = traci.lane.getLength("n_t.100_0") / 7
-        #auxlane = min(1.0, n_vehiculos / capacidad)
-    
-        #print(f"{obs}    |   {auxlane}")
+        sumo = ts.sumo                               # misma conexión que usa el env
+        veh_len = sumo.lane.getLastStepLength(lane_1_id) + MIN_GAP
+        cap = sumo.lane.getLength(lane_1_id) / veh_len
+        density = min(1, sumo.lane.getLastStepVehicleNumber(lane_1_id) / cap)
+        queue   = min(1, sumo.lane.getLastStepHaltingNumber(lane_1_id) / cap)
 
-        vehicle_size_min_gap = traci.lane.getLastStepLength(lane_id) + MIN_GAP
-        lane_length = traci.lane.getLength(lane_id)
-
-        density = traci.lane.getLastStepVehicleNumber(lane_id) / (lane_length / vehicle_size_min_gap)
-        queu = traci.lane.getLastStepHaltingNumber(lane_id) / (lane_length / vehicle_size_min_gap)
-
-        print(f"{obs}    |   {density}     |       {queu}")
+        print(f"obs = {next_obs[3]:.3f}  {next_obs[7]:.3f}  | density = {density:.3f}  queu = {queue:.3f}")
 
         ###########
-
+        '''
 
         # episode finished?
         done = terminated or truncated
