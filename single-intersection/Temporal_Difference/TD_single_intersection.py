@@ -7,8 +7,8 @@ import random
 actions = [0, 1]
 
 states = [
-    (phase, den_n2s, den_w2e, queue_n2s, queue_w2e)
-    for phase in ["GGrr", "rrGG"]
+    (den_n2s, den_w2e, queue_n2s, queue_w2e)
+    #for phase in ["GGrr", "rrGG"]
     for den_n2s in range(1,9)
     for den_w2e in range(1,9)
     for queue_n2s in range(1,9)
