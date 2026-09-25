@@ -1,7 +1,7 @@
 import pickle
 from pprint import pformat
 
-with open("Temporal_Difference/experiments/E_SARSA_experiment_2026-09-25_08-22-36/best_policy_2026-09-25_08-22-36.pkl", 
+with open("Temporal_Difference/experiments/E_SARSA_experiment_2026-09-17_22-15-09/best_policy_2026-09-17_22-15-09.pkl", 
           "rb") as f:
     datos = pickle.load(f)
 
