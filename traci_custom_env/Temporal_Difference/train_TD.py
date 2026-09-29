@@ -1,3 +1,8 @@
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath("train_TD.py"))))
+
 from sumo_rl_env import SumoEnv
 import numpy as np
 from funciones import train_episode_td, save_experiment
@@ -60,23 +65,21 @@ for seed in seeds:
 
     # creation of environment
     env = SumoEnv(
-        sumocfg_path="single-intersection.sumocfg",  # <-- cambia esto por tu archivo
+        sumocfg_path="../single-intersection.sumocfg",  # <-- cambia esto por tu archivo
         tls_id="t",                                   # <-- cambia esto por el id real
         use_gui=False,
         sim_steps_per_action=delta_time,
-        max_simulation_steps=num_seconds,
+        max_simulation_time=num_seconds,
     )
 
-    base_env = env.unwrapped
 
     for episode in range(episodes):
 
         # elige un factor de escala aleatorio para este episodio
         scale_factor = random.uniform(0.1, 1.5)  # ej: entre 50% y 150% de la demanda base
-        base_env.additional_sumo_cmd = f"--scale {scale_factor}"
 
         # reset environment
-        obs, info = env.reset(seed=seed + episode)
+        obs = env.reset(seed=seed + episode, scale=scale_factor)
 
         # initial state
         initial_state = obs

@@ -3,7 +3,7 @@ import random
 def discretization(obs):
 
     # ===== PHASE =====
-    phase = "GGrr" if obs[0] == 1 else "rrGG"
+    #phase = "GGrr" if obs[0] == 1 else "rrGG"
 
     # ===== AUXILIARY FUNCTION =====
     def categorize(value):
@@ -25,6 +25,7 @@ def discretization(obs):
         else:
             return 8
 
+    '''
     # ===== DENSITIES =====
     density_n2s = (obs[3] + obs[4]) / 2
     density_w2e = (obs[5] + obs[6]) / 2
@@ -38,14 +39,19 @@ def discretization(obs):
 
     queue_n2s = categorize(queue_n2s)
     queue_w2e = categorize(queue_w2e)
+    '''
+    lane_1 = categorize(obs[1])
+    lane_2 = categorize(obs[2])
+    lane_3 = categorize(obs[3])
+    lane_4 = categorize(obs[4])
 
     # ===== DISCRETE STATE =====
     return (
-        phase,
-        density_n2s,
-        density_w2e,
-        queue_n2s,
-        queue_w2e
+        obs[0],
+        lane_1,
+        lane_2,
+        lane_3,
+        lane_4
     )
 
 def choose_action(state, epsilon, actions, Q, min_green_flag, current_phase_action):
@@ -74,10 +80,10 @@ def train_episode_td(env, obs, actions, gamma, alpha, Q, epsilon, method):
     while True:
           
         # execute action
-        next_obs, reward, terminated, truncated, info = env.step(action)
+        next_obs, reward, terminated, _ = env.step(action)
 
         # episode finished?
-        done = terminated or truncated
+        done = terminated 
 
         # discretize next state
         next_state = discretization(next_obs)

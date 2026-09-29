@@ -28,7 +28,7 @@ class SumoEnv:
         tls_id: str,
         use_gui: bool = False,
         sim_steps_per_action: int = 5,
-        max_simulation_steps: int = 1000,
+        max_simulation_time: int = 1000,
         yellow_time: int = 3,
         gui_delay_ms: int = 0,
     ):
@@ -36,15 +36,14 @@ class SumoEnv:
         self.tls_id = tls_id
         self.use_gui = use_gui
         self.sim_steps_per_action = sim_steps_per_action
-        self.max_simulation_steps = max_simulation_steps  # segundos simulados
+        self.max_simulation_time = max_simulation_time  # segundos simulados
         self.yellow_time = yellow_time                    # segundos de amarillo
         self.gui_delay_ms = gui_delay_ms
 
-        self._sumo_binary = "sumo-gui" if use_gui else "sumo"
         self.episode_step = 0
 
         # Leer la lógica del semáforo con una conexión de prueba.
-        self._connect()
+        self._connect(gui=False)
         logic = traci.trafficlight.getAllProgramLogics(self.tls_id)[0]
         self.logic = logic.phases
         self.n_phases = len(self.logic)
@@ -54,6 +53,12 @@ class SumoEnv:
             i for i, p in enumerate(self.logic)
             if ("G" in p.state or "g" in p.state) and "y" not in p.state
         ]
+        if not self.green_phases:
+            self._disconnect()
+            raise ValueError(
+                f"No se encontraron fases verdes en el semáforo '{tls_id}'"
+            )
+        
         # Amarillo asociado a cada fase verde: la fase siguiente si es amarilla.
         self.yellow_after = {}
         for g in self.green_phases:
@@ -71,10 +76,17 @@ class SumoEnv:
         self.observation_space_shape = (len(self.lanes),)
 
     # ------------------------------------------------------------------
-    def _connect(self):
-        sumo_cmd = [self._sumo_binary, "-c", self.sumocfg_path, "--no-warnings"]
-        if self.use_gui and self.gui_delay_ms > 0:
+    def _connect(self, seed: int = None, gui: bool = None, scale: float = None):
+        use_gui = self.use_gui if gui is None else gui
+        binary = "sumo-gui" if use_gui else "sumo"
+ 
+        sumo_cmd = [binary, "-c", self.sumocfg_path, "--no-warnings"]
+        if use_gui and self.gui_delay_ms > 0:
             sumo_cmd += ["--delay", str(self.gui_delay_ms)]
+        if seed is not None:
+            sumo_cmd += ["--seed", str(seed)]
+        if scale is not None:
+            sumo_cmd += ["--scale", str(scale)]
         traci.start(sumo_cmd)
 
     def _disconnect(self):
@@ -84,13 +96,12 @@ class SumoEnv:
             pass
 
     # ------------------------------------------------------------------
-    def reset(self):
+    def reset(self, seed: int = None, scale: float = None):
         """Reinicia la simulación y devuelve el estado inicial."""
         self._disconnect()
-        self._connect()
+        self._connect(seed=seed, scale=scale)
         self.episode_step = 0
 
-        # Empezar en la primera fase verde y mantenerla hasta que el agente decida.
         first_green = self.green_phases[0]
         traci.trafficlight.setPhase(self.tls_id, first_green)
         traci.trafficlight.setPhaseDuration(self.tls_id, 10000)
@@ -128,7 +139,7 @@ class SumoEnv:
         next_state = self._get_state()
         reward = self._get_reward()
         done = (
-            traci.simulation.getTime() >= self.max_simulation_steps
+            traci.simulation.getTime() >= self.max_simulation_time
             or traci.simulation.getMinExpectedNumber() <= 0
         )
         info = {"sim_time": traci.simulation.getTime()}
@@ -140,8 +151,14 @@ class SumoEnv:
 
     # ------------------------------------------------------------------
     def _get_state(self):
-        """Estado simple: nº de vehículos detenidos por carril controlado."""
-        state = [traci.lane.getLastStepHaltingNumber(l) for l in self.lanes]
+        state = []
+        phase = traci.trafficlight.getPhase(self.tls_id)
+        state.append(phase)
+        for lane in self.lanes:
+            vehicle_size_min_gap = traci.lane.getLastStepLength(lane) + 2.5
+            lane_length = traci.lane.getLength(lane)
+            queu = traci.lane.getLastStepHaltingNumber(lane) / (lane_length / vehicle_size_min_gap)
+            state.append(queu)
         return np.array(state, dtype=np.float32)
 
     def _get_reward(self):
@@ -157,9 +174,9 @@ if __name__ == "__main__":
     env = SumoEnv(
         sumocfg_path="single-intersection.sumocfg",  # <-- cambia esto por tu archivo
         tls_id="t",                                   # <-- cambia esto por el id real
-        use_gui=True,
+        use_gui=False,
         sim_steps_per_action=5,
-        max_simulation_steps=800,
+        max_simulation_time=800,
         yellow_time=3,
         gui_delay_ms=50,
     )
