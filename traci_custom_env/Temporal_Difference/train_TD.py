@@ -1,7 +1,7 @@
 import sys
 import os
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath("train_TD.py"))))
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from sumo_rl_env import SumoEnv
 import numpy as np
@@ -12,12 +12,12 @@ actions = [0, 1]
 
 
 states = [
-    (phase, den_n2s, den_w2e, queue_n2s, queue_w2e)
-    for phase in ["GGrr", "rrGG"]
-    for den_n2s in range(1,9)
-    for den_w2e in range(1,9)
-    for queue_n2s in range(1,9)
-    for queue_w2e in range(1,9)
+    (phase, lane_1, lane_2, lane_3, lane_4)
+    for phase in [0, 2]
+    for lane_1 in range(1,9)
+    for lane_2 in range(1,9)
+    for lane_3 in range(1,9)
+    for lane_4 in range(1,9)
 ]
 
 import yaml

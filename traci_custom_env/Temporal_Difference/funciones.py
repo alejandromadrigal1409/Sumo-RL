@@ -54,9 +54,7 @@ def discretization(obs):
         lane_4
     )
 
-def choose_action(state, epsilon, actions, Q, min_green_flag, current_phase_action):
-    if min_green_flag == 0:
-        return current_phase_action
+def choose_action(state, epsilon, actions, Q):
     
     if random.random() < epsilon:
         return random.choice(actions)
@@ -72,10 +70,7 @@ def train_episode_td(env, obs, actions, gamma, alpha, Q, epsilon, method):
 
     state = discretization(obs)
 
-    # select action
-    min_green_flag = int(obs[2])
-    current_phase_action = 0 if obs[0] == 1 else 1
-    action = choose_action(state, epsilon, actions, Q, min_green_flag, current_phase_action)
+    action = choose_action(state, epsilon, actions, Q)
 
     while True:
           
@@ -88,21 +83,18 @@ def train_episode_td(env, obs, actions, gamma, alpha, Q, epsilon, method):
         # discretize next state
         next_state = discretization(next_obs)
 
-        next_min_green_flag = int(next_obs[2])
-        next_current_phase_action = 0 if next_obs[0] == 1 else 1
-
         episode_reward += reward
 
         if method == "SARSA":
-            next_act = choose_action(next_state, epsilon, actions, Q, next_min_green_flag, next_current_phase_action)
+            next_act = choose_action(next_state, epsilon, actions, Q)
             Q[(state, action)] += alpha * (reward + (gamma * Q[(next_state, next_act)]) - Q[(state, action)])
 
         elif method == "QL":
             max_q = max(Q[(next_state, act)] for act in actions)
             Q[(state, action)] += alpha * (reward + (gamma * max_q) - Q[(state, action)])
-            next_act = choose_action(next_state, epsilon, actions, Q, next_min_green_flag, next_current_phase_action)
+            next_act = choose_action(next_state, epsilon, actions, Q)
             
-        else:
+        elif method == "E_SARSA":
             max_q = max(Q[(next_state, act)] for act in actions)
 
             best_actions = [
@@ -124,7 +116,10 @@ def train_episode_td(env, obs, actions, gamma, alpha, Q, epsilon, method):
 
             # Qu update
             Q[(state, action)] += alpha * (reward + (gamma * expected_q) - Q[(state,action)])
-            next_act = choose_action(next_state, epsilon, actions, Q, next_min_green_flag, next_current_phase_action)
+            next_act = choose_action(next_state, epsilon, actions, Q)
+
+        else:
+            raise ValueError(f"RL method no válido: {method}")
 
 
         # move to next state

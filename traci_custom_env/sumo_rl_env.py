@@ -162,9 +162,16 @@ class SumoEnv:
         return np.array(state, dtype=np.float32)
 
     def _get_reward(self):
-        """Recompensa: negativo del total de vehículos detenidos."""
-        total_halted = sum(traci.lane.getLastStepHaltingNumber(l) for l in self.lanes)
-        return -float(total_halted)
+        """Recompensa: negativo del promedio de ocupación por congestión
+        (vehículos detenidos / capacidad del carril), promediado entre carriles.
+        Queda en un rango aproximado de [-1, 0]."""
+        total = 0.0
+        for lane in self.lanes:
+            vehicle_size_min_gap = traci.lane.getLastStepLength(lane) + 2.5
+            lane_length = traci.lane.getLength(lane)
+            capacity = lane_length / vehicle_size_min_gap
+            total += traci.lane.getLastStepHaltingNumber(lane) / capacity
+        return -total / len(self.lanes)
 
 
 # --------------------------------------------------------------------------
@@ -174,7 +181,7 @@ if __name__ == "__main__":
     env = SumoEnv(
         sumocfg_path="single-intersection.sumocfg",  # <-- cambia esto por tu archivo
         tls_id="t",                                   # <-- cambia esto por el id real
-        use_gui=False,
+        use_gui=True,
         sim_steps_per_action=5,
         max_simulation_time=800,
         yellow_time=3,
