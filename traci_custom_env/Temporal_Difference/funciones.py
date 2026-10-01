@@ -8,22 +8,14 @@ def discretization(obs):
     # ===== AUXILIARY FUNCTION =====
     def categorize(value):
 
-        if value < 0.125:
+        if value < 0.25:
             return 1
-        elif value < 0.25:
-            return 2
-        elif value < 0.375:
-            return 3
         elif value < 0.5:
-            return 4
-        elif value < 0.625:
-            return 5
+            return 2
         elif value < 0.75:
-            return 6
-        elif value < 0.875:
-            return 7
+            return 3
         else:
-            return 8
+            return 4
 
     '''
     # ===== DENSITIES =====
@@ -44,6 +36,8 @@ def discretization(obs):
     lane_2 = categorize(obs[2])
     lane_3 = categorize(obs[3])
     lane_4 = categorize(obs[4])
+    lane_5 = categorize(obs[5])
+    lane_6 = categorize(obs[6])
 
     # ===== DISCRETE STATE =====
     return (
@@ -51,7 +45,9 @@ def discretization(obs):
         lane_1,
         lane_2,
         lane_3,
-        lane_4
+        lane_4,
+        lane_5,
+        lane_6
     )
 
 def choose_action(state, epsilon, actions, Q):
