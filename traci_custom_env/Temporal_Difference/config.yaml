@@ -4,7 +4,7 @@ delta_time: 20
 
 # ===== RL HYPERPARAMETERS =====
 gamma: 0.9
-episodes: 400
+episodes: 800
 epsilon_update_interval: 4
 alpha: 0.1
 
@@ -16,7 +16,7 @@ epsilon:
 
 # ===== TRAINING =====
 master_seed: 34
-num_trainings: 2
+num_trainings: 20
 
 # ===== TEMPORSAL DIFFERENCE =====
 method: "E_SARSA"

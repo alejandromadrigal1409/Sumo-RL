@@ -65,7 +65,7 @@ for seed in seeds:
 
     # creation of environment
     env = SumoEnv(
-        sumocfg_path="../single-intersection.sumocfg",  # <-- cambia esto por tu archivo
+        sumocfg_path="../single-intersection_V2.sumocfg",  # <-- cambia esto por tu archivo
         tls_id="t",                                   # <-- cambia esto por el id real
         use_gui=False,
         sim_steps_per_action=delta_time,
