@@ -10,7 +10,12 @@ if "SUMO_HOME" in os.environ:
 else:
     sys.exit("Por favor define la variable de entorno SUMO_HOME")
 
-import traci  # noqa: E402
+try:
+    import libsumo as traci  # noqa: E402
+    USING_LIBSUMO = True
+except ImportError:
+    import traci  # noqa: E402
+    USING_LIBSUMO = False
 
 
 class SumoEnv:
@@ -79,6 +84,13 @@ class SumoEnv:
     def _connect(self, seed: int = None, gui: bool = None, scale: float = None):
         use_gui = self.use_gui if gui is None else gui
         binary = "sumo-gui" if use_gui else "sumo"
+
+        if use_gui and USING_LIBSUMO:
+            raise RuntimeError(
+                "libsumo no soporta sumo-gui (no hay visualización). "
+                "Usa use_gui=False, o fuerza TraCI normal comentando el "
+                "'import libsumo as traci' si necesitas ver la simulación."
+            )
  
         sumo_cmd = [binary, "-c", self.sumocfg_path, "--no-warnings"]
         if use_gui and self.gui_delay_ms > 0:
@@ -92,7 +104,7 @@ class SumoEnv:
     def _disconnect(self):
         try:
             traci.close()
-        except (traci.exceptions.FatalTraCIError, traci.exceptions.TraCIException):
+        except Exception:
             pass
 
     # ------------------------------------------------------------------
