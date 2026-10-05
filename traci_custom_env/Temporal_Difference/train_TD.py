@@ -12,14 +12,14 @@ actions = [0, 1]
 
 
 states = [
-    (phase, lane_1, lane_2, lane_3, lane_4, lane_5, lane_6)
+    (phase, lane_1, lane_3, lane_5, lane_6)
     for phase in [0, 2]
-    for lane_1 in range(1,5)
-    for lane_2 in range(1,5)
-    for lane_3 in range(1,5)
-    for lane_4 in range(1,5)
-    for lane_5 in range(1,5)
-    for lane_6 in range(1,5)
+    for lane_1 in range(1,6)
+    #for lane_2 in range(1,6)
+    for lane_3 in range(1,6)
+    #for lane_4 in range(1,6)
+    for lane_5 in range(1,6)
+    for lane_6 in range(1,6)
 ]
 
 import yaml

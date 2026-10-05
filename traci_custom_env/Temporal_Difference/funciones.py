@@ -8,14 +8,16 @@ def discretization(obs):
     # ===== AUXILIARY FUNCTION =====
     def categorize(value):
 
-        if value < 0.25:
+        if value < 0.2:
             return 1
-        elif value < 0.5:
+        elif value < 0.4:
             return 2
-        elif value < 0.75:
+        elif value < 0.6:
             return 3
-        else:
+        elif value < 0.8:
             return 4
+        else:
+            return 5
 
     '''
     # ===== DENSITIES =====
@@ -32,10 +34,10 @@ def discretization(obs):
     queue_n2s = categorize(queue_n2s)
     queue_w2e = categorize(queue_w2e)
     '''
-    lane_1 = categorize(obs[1])
-    lane_2 = categorize(obs[2])
-    lane_3 = categorize(obs[3])
-    lane_4 = categorize(obs[4])
+    lane_1 = categorize((obs[1] + obs[2] / 2))
+    #lane_2 = categorize(obs[2])
+    lane_3 = categorize((obs[3] + obs[4] / 2))
+    #lane_4 = categorize(obs[4])
     lane_5 = categorize(obs[5])
     lane_6 = categorize(obs[6])
 
@@ -43,9 +45,9 @@ def discretization(obs):
     return (
         obs[0],
         lane_1,
-        lane_2,
+        #lane_2,
         lane_3,
-        lane_4,
+        #lane_4,
         lane_5,
         lane_6
     )
