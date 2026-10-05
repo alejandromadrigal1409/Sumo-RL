@@ -38,8 +38,8 @@ def discretization(obs):
     #lane_2 = categorize(obs[2])
     lane_3 = categorize((obs[3] + obs[4] / 2))
     #lane_4 = categorize(obs[4])
-    lane_5 = categorize(obs[5])
-    lane_6 = categorize(obs[6])
+    #lane_5 = categorize(obs[5])
+    #lane_6 = categorize(obs[6])
 
     # ===== DISCRETE STATE =====
     return (
@@ -48,8 +48,8 @@ def discretization(obs):
         #lane_2,
         lane_3,
         #lane_4,
-        lane_5,
-        lane_6
+        #lane_5,
+        #lane_6
     )
 
 def choose_action(state, epsilon, actions, Q):

@@ -12,14 +12,14 @@ actions = [0, 1]
 
 
 states = [
-    (phase, lane_1, lane_3, lane_5, lane_6)
+    (phase, lane_1, lane_3)
     for phase in [0, 2]
     for lane_1 in range(1,6)
     #for lane_2 in range(1,6)
     for lane_3 in range(1,6)
     #for lane_4 in range(1,6)
-    for lane_5 in range(1,6)
-    for lane_6 in range(1,6)
+    #for lane_5 in range(1,6)
+    #for lane_6 in range(1,6)
 ]
 
 import yaml
@@ -37,6 +37,7 @@ method = config["method"]
 master_seed = config["master_seed"]
 num_trainings = config["num_trainings"]
 alpha = config["alpha"]
+sumof_cfg = config["sumof_cfg"]
 
 # ====== MAIN CODE =========
 
@@ -67,7 +68,7 @@ for seed in seeds:
 
     # creation of environment
     env = SumoEnv(
-        sumocfg_path="../single-intersection_V2.sumocfg",  # <-- cambia esto por tu archivo
+        sumocfg_path=f"../{sumof_cfg}",  # <-- cambia esto por tu archivo
         tls_id="t",                                   # <-- cambia esto por el id real
         use_gui=False,
         sim_steps_per_action=delta_time,
