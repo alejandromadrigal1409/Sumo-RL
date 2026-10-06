@@ -2,55 +2,65 @@ import random
 
 def discretization(obs):
 
-    # ===== PHASE =====
-    #phase = "GGrr" if obs[0] == 1 else "rrGG"
-
-    # ===== AUXILIARY FUNCTION =====
-    def categorize(value):
-
-        if value < 0.2:
-            return 1
-        elif value < 0.4:
-            return 2
-        elif value < 0.6:
-            return 3
-        elif value < 0.8:
-            return 4
-        else:
-            return 5
-
-    '''
-    # ===== DENSITIES =====
-    density_n2s = (obs[3] + obs[4]) / 2
-    density_w2e = (obs[5] + obs[6]) / 2
-
-    density_n2s = categorize(density_n2s)
-    density_w2e = categorize(density_w2e)
-
-    # ===== QUEUES =====
-    queue_n2s = (obs[7] + obs[8]) / 2
-    queue_w2e = (obs[9] + obs[10]) / 2
-
-    queue_n2s = categorize(queue_n2s)
-    queue_w2e = categorize(queue_w2e)
-    '''
-    lane_1 = categorize((obs[1] + obs[2] / 2))
-    #lane_2 = categorize(obs[2])
-    lane_3 = categorize((obs[3] + obs[4] / 2))
-    #lane_4 = categorize(obs[4])
-    #lane_5 = categorize(obs[5])
-    #lane_6 = categorize(obs[6])
+    s0 = categorize((obs[1] + obs[2] / 2))
+    s1 = categorize((obs[3] + obs[4] / 2))
 
     # ===== DISCRETE STATE =====
     return (
         obs[0],
-        lane_1,
-        #lane_2,
-        lane_3,
-        #lane_4,
-        #lane_5,
-        #lane_6
+        s0,
+        s1
     )
+
+def discretization_V2(obs):
+
+    s0 = categorize((obs[1] + obs[2] / 2))
+    s1 = categorize((obs[3] + obs[4] / 2))
+    s2 = categorize(obs[5])
+    s3 = categorize(obs[6])
+
+    # ===== DISCRETE STATE =====
+    return (
+        obs[0],
+        s0,
+        s1,
+        s2,
+        s3
+    )
+
+def discretization_V3(obs):
+
+    s0 = categorize((obs[1] + obs[2] / 2))
+    s1 = categorize((obs[3] + obs[4] / 2))
+    s2 = categorize(obs[5])
+    s3 = categorize(obs[6])
+    s4 = categorize(obs[7])
+    s5 = categorize(obs[8])
+
+    # ===== DISCRETE STATE =====
+    return (
+        obs[0],
+        s0,
+        s1,
+        s2,
+        s3,
+        s4,
+        s5
+    )
+
+# ===== AUXILIARY FUNCTION =====
+def categorize(value):
+
+    if value < 0.2:
+        return 1
+    elif value < 0.4:
+        return 2
+    elif value < 0.6:
+        return 3
+    elif value < 0.8:
+        return 4
+    else:
+        return 5
 
 def choose_action(state, epsilon, actions, Q):
     
@@ -66,7 +76,7 @@ def choose_action(state, epsilon, actions, Q):
 def train_episode_td(env, obs, actions, gamma, alpha, Q, epsilon, method):
     episode_reward = 0
 
-    state = discretization(obs)
+    state = discretization_V3(obs)
 
     action = choose_action(state, epsilon, actions, Q)
 
@@ -79,7 +89,7 @@ def train_episode_td(env, obs, actions, gamma, alpha, Q, epsilon, method):
         done = terminated 
 
         # discretize next state
-        next_state = discretization(next_obs)
+        next_state = discretization_V3(next_obs)
 
         episode_reward += reward
 

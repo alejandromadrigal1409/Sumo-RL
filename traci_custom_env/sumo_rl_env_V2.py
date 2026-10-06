@@ -166,7 +166,7 @@ class SumoEnv:
         state = []
         phase = traci.trafficlight.getPhase(self.tls_id)
         state.append(phase)
-        for lane in self.lanes:
+        for lane in self.lanes + ["E2_0", "E1_0"]:
             vehicle_size_min_gap = traci.lane.getLastStepLength(lane) + 2.5
             lane_length = traci.lane.getLength(lane)
             queu = traci.lane.getLastStepHaltingNumber(lane) / (lane_length / vehicle_size_min_gap)

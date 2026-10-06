@@ -3,24 +3,12 @@ import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from sumo_rl_env import SumoEnv
+from sumo_rl_env_V3 import SumoEnv
 import numpy as np
 from funciones import train_episode_td, save_experiment
 import random
 
 actions = [0, 1]
-
-
-states = [
-    (phase, lane_1, lane_3)
-    for phase in [0, 2]
-    for lane_1 in range(1,6)
-    #for lane_2 in range(1,6)
-    for lane_3 in range(1,6)
-    #for lane_4 in range(1,6)
-    #for lane_5 in range(1,6)
-    #for lane_6 in range(1,6)
-]
 
 import yaml
 with open("config.yaml", "r") as f:
@@ -62,8 +50,6 @@ for seed in seeds:
     training_rewards  = []
 
     # Q(s,a) Values
-    #Q = {(s, a): 0.0 for s in states for a in actions}
-
     Q = defaultdict(float) 
 
     # creation of environment
