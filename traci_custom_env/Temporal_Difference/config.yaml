@@ -17,7 +17,7 @@ epsilon:
 
 # ===== TRAINING =====
 master_seed: 34
-num_trainings: 1
+num_trainings: 25
 
 # ===== TEMPORSAL DIFFERENCE =====
 method: "QL"

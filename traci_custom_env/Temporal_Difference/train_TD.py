@@ -10,6 +10,17 @@ import random
 
 actions = [0, 1]
 
+states = [
+    (phase, s0, s1, s2, s3, s4, s5)
+    for phase in [0, 1]
+    for s0 in range(1,6)
+    for s1 in range(1,6)
+    for s2 in range(1,6)
+    for s3 in range(1,6)
+    for s4 in range(1,6)
+    for s5 in range(1,6)
+]
+
 import yaml
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
