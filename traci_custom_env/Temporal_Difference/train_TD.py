@@ -3,7 +3,7 @@ import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from sumo_rl_env import SumoEnv
+from sumo_rl_env_V3 import SumoEnv
 import numpy as np
 from funciones import train_episode_td, save_experiment
 import random
@@ -11,14 +11,14 @@ import random
 actions = [0, 1]
 
 states = [
-    (phase, s0, s1)#, s2, s3, s4, s5)
+    (phase, s0, s1, s2, s3, s4, s5)
     for phase in [0, 1]
     for s0 in range(1,6)
     for s1 in range(1,6)
-    #for s2 in range(1,6)
-    #for s3 in range(1,6)
-    #for s4 in range(1,6)
-    #for s5 in range(1,6)
+    for s2 in range(1,6)
+    for s3 in range(1,6)
+    for s4 in range(1,6)
+    for s5 in range(1,6)
 ]
 
 import yaml
@@ -67,7 +67,7 @@ for seed in seeds:
     env = SumoEnv(
         sumocfg_path=f"../{sumof_cfg}",  # <-- cambia esto por tu archivo
         tls_id="t",                                   # <-- cambia esto por el id real
-        use_gui=True,
+        use_gui=False,
         sim_steps_per_action=delta_time,
         max_simulation_time=num_seconds,
     )

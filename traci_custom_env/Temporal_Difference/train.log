@@ -1,6 +1,1 @@
 nohup: no se tendrá en cuenta la entrada
-Traceback (most recent call last):
-  File "/home/alejandro/sumo-rl/SimulacionesSUMO/traci_custom_env/Temporal_Difference/train_TD.py", line 107, in <module>
-    for s in states:
-             ^^^^^^
-NameError: name 'states' is not defined
