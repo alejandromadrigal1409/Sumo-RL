@@ -1,7 +1,7 @@
 import pickle
 from pprint import pformat
 
-experimento = "QL_experiment_2026-10-07_19-40-46/best_policy_2026-10-07_19-40-46.pkl"
+experimento = "QL_experiment_2026-10-08_03-51-10/best_policy_2026-10-08_03-51-10.pkl"
 
 with open(f"Temporal_Difference/experiments/{experimento}", 
           "rb") as f:
