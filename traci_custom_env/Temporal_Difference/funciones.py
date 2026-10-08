@@ -76,7 +76,7 @@ def choose_action(state, epsilon, actions, Q):
 def train_episode_td(env, obs, actions, gamma, alpha, Q, epsilon, method):
     episode_reward = 0
 
-    state = discretization_V3(obs)
+    state = discretization_V2(obs)
 
     action = choose_action(state, epsilon, actions, Q)
 
@@ -89,7 +89,7 @@ def train_episode_td(env, obs, actions, gamma, alpha, Q, epsilon, method):
         done = terminated 
 
         # discretize next state
-        next_state = discretization_V3(next_obs)
+        next_state = discretization_V2(next_obs)
 
         episode_reward += reward
 
