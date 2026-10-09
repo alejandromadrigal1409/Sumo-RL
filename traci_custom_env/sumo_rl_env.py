@@ -192,9 +192,9 @@ class SumoEnv:
 # --------------------------------------------------------------------------
 if __name__ == "__main__":
     env = SumoEnv(
-        sumocfg_path="single-intersection.sumocfg",  # <-- cambia esto por tu archivo
+        sumocfg_path="2way-single-intersection/single-intersection.sumocfg",  # <-- cambia esto por tu archivo
         tls_id="t",                                   # <-- cambia esto por el id real
-        use_gui=True,
+        use_gui=False,
         sim_steps_per_action=5,
         max_simulation_time=800,
         yellow_time=3,
