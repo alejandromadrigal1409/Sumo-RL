@@ -1,7 +1,7 @@
 <configuration>
     <input>
-        <net-file value="network.net.xml"/>
-        <route-files value="flow.rou.xml"/>
+        <net-file value="single-intersection.net.xml"/>
+        <route-files value="single-intersection-gen.rou.xml"/>
     </input>
     <time>
         <begin value="0"/>
