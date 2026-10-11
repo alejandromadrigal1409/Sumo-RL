@@ -1,5 +1,5 @@
 # ===== ENVIRONMENT =====
-num_seconds: 5000
+num_seconds: 2000
 delta_time: 20
 sumof_cfg: "2way-single-intersection/single-intersection.sumocfg"
 
@@ -17,7 +17,7 @@ epsilon:
 
 # ===== TRAINING =====
 master_seed: 34
-num_trainings: 20
+num_trainings: 1
 
 # ===== TEMPORSAL DIFFERENCE =====
 method: "QL"

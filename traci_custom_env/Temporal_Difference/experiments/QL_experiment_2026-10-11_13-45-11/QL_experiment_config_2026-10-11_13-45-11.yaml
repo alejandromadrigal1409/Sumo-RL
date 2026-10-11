@@ -1,0 +1,16 @@
+num_seconds: 2000
+delta_time: 20
+sumof_cfg: 2way-single-intersection/single-intersection.sumocfg
+gamma: 0.9
+episodes: 5000
+epsilon_update_interval: 4
+alpha: 0.1
+epsilon:
+  start: 0.1
+  min: 0.01
+  decay: 0.95
+master_seed: 34
+num_trainings: 1
+method: QL
+generated_seeds:
+- 69329
