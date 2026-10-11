@@ -4,28 +4,32 @@ import numpy as np
 
 # --- Asegurar que TraCI/SUMO estén disponibles ---
 if "SUMO_HOME" in os.environ:
-    tools = os.path.join(os.environ["SUMO_HOME"], "tools")
-    sys.path.append(tools)
-
+    sys.path.append(os.path.join(os.environ["SUMO_HOME"], "tools"))
 else:
     sys.exit("Por favor define la variable de entorno SUMO_HOME")
 
-try:
-    import libsumo as traci  # noqa: E402
-    USING_LIBSUMO = True
-except ImportError:
+# True = TraCI normal (permite sumo-gui) | False = libsumo (rápido, sin GUI)
+FORCE_TRACI = False
+
+if FORCE_TRACI:
     import traci  # noqa: E402
     USING_LIBSUMO = False
+else:
+    try:
+        import libsumo as traci  # noqa: E402
+        USING_LIBSUMO = True
+    except ImportError:
+        import traci  # noqa: E402
+        USING_LIBSUMO = False
 
-#import traci
 
 class SumoEnv:
-    """Entorno RL minimalista basado en TraCI (sin heredar de gym.Env,
-    pero con la misma interfaz reset/step/close para que sea fácil de envolver).
+    """Entorno RL minimalista para un semáforo.
 
-    El agente elige entre las fases VERDES del semáforo. Si la acción implica
-    cambiar de fase, el entorno inserta automáticamente la fase amarilla
-    correspondiente antes de pasar a la nueva fase verde.
+    Espacio de acciones = TODAS las fases del programa del semáforo
+    (verdes, amarillas, etc.). La acción i pone directamente la fase i.
+    No se inserta ningún amarillo automático: si quieres amarillos entre
+    verdes, el agente tiene que elegirlos él mismo.
     """
 
     def __init__(
@@ -35,65 +39,39 @@ class SumoEnv:
         use_gui: bool = False,
         sim_steps_per_action: int = 5,
         max_simulation_time: int = 1000,
-        yellow_time: int = 3,
         gui_delay_ms: int = 0,
     ):
         self.sumocfg_path = sumocfg_path
         self.tls_id = tls_id
         self.use_gui = use_gui
         self.sim_steps_per_action = sim_steps_per_action
-        self.max_simulation_time = max_simulation_time  # segundos simulados
-        self.yellow_time = yellow_time                    # segundos de amarillo
+        self.max_simulation_time = max_simulation_time
         self.gui_delay_ms = gui_delay_ms
 
-        self.episode_step = 0
-
-        # Leer la lógica del semáforo con una conexión de prueba.
+        # Conexión de prueba para leer fases y carriles del semáforo.
         self._connect(gui=False)
-        logic = traci.trafficlight.getAllProgramLogics(self.tls_id)[0]
-        self.logic = logic.phases
+        self.logic = traci.trafficlight.getAllProgramLogics(self.tls_id)[0].phases
         self.n_phases = len(self.logic)
-
-        # Fases verdes: tienen 'G' o 'g' y ninguna 'y'.
-        self.green_phases = [
-            i for i, p in enumerate(self.logic)
-            if ("G" in p.state or "g" in p.state) and "y" not in p.state
-        ]
-        if not self.green_phases:
-            self._disconnect()
-            raise ValueError(
-                f"No se encontraron fases verdes en el semáforo '{tls_id}'"
-            )
-        
-        # Amarillo asociado a cada fase verde: la fase siguiente si es amarilla.
-        self.yellow_after = {}
-        for g in self.green_phases:
-            nxt = (g + 1) % self.n_phases
-            self.yellow_after[g] = nxt if "y" in self.logic[nxt].state else None
-
-        # Dimensión del estado = nº de carriles controlados (sin duplicados).
         self.lanes = list(dict.fromkeys(
             traci.trafficlight.getControlledLanes(self.tls_id)
         ))
         self._disconnect()
 
-        # Espacios (formato tipo gym, sin depender de la librería gym)
-        self.action_space_n = len(self.green_phases)
-        self.observation_space_shape = (len(self.lanes),)
+        # Una acción por cada fase del semáforo.
+        self.action_space_n = self.n_phases
+        # Estado = [fase actual, cola normalizada de cada carril]
+        self.observation_space_shape = (1 + len(self.lanes),)
 
     # ------------------------------------------------------------------
     def _connect(self, seed: int = None, gui: bool = None, scale: float = None):
         use_gui = self.use_gui if gui is None else gui
-        binary = "sumo-gui" if use_gui else "sumo"
-   
         if use_gui and USING_LIBSUMO:
             raise RuntimeError(
-                "libsumo no soporta sumo-gui (no hay visualización). "
-                "Usa use_gui=False, o fuerza TraCI normal comentando el "
-                "'import libsumo as traci' si necesitas ver la simulación."
+                "libsumo no soporta sumo-gui. Pon FORCE_TRACI = True "
+                "o use_gui=False."
             )
-    
-        sumo_cmd = [binary, "-c", self.sumocfg_path, "--no-warnings"]
+        sumo_cmd = ["sumo-gui" if use_gui else "sumo",
+                    "-c", self.sumocfg_path, "--no-warnings"]
         if use_gui and self.gui_delay_ms > 0:
             sumo_cmd += ["--delay", str(self.gui_delay_ms)]
         if seed is not None:
@@ -110,119 +88,71 @@ class SumoEnv:
 
     # ------------------------------------------------------------------
     def reset(self, seed: int = None, scale: float = None):
-        """Reinicia la simulación y devuelve el estado inicial."""
         self._disconnect()
         self._connect(seed=seed, scale=scale)
-        self.episode_step = 0
-
-        first_green = self.green_phases[0]
-        traci.trafficlight.setPhase(self.tls_id, first_green)
+        # Empezar en la fase 0 y mantenerla hasta que el agente decida otra.
+        traci.trafficlight.setPhase(self.tls_id, 0)
         traci.trafficlight.setPhaseDuration(self.tls_id, 10000)
         return self._get_state()
 
     def step(self, action: int):
-        """
-        action: índice (0..action_space_n-1) dentro de la lista de fases verdes.
-        Devuelve: (next_state, reward, done, info)
-        """
-        target_phase = self.green_phases[action]
-        current_phase = traci.trafficlight.getPhase(self.tls_id)
-
-        if target_phase != current_phase:
-            # 1) Amarillo de transición (si la fase actual es verde y tiene amarillo)
-            yellow = self.yellow_after.get(current_phase)
-            if yellow is not None:
-                traci.trafficlight.setPhase(self.tls_id, yellow)
-                traci.trafficlight.setPhaseDuration(self.tls_id, self.yellow_time)
-                n_yellow = max(1, int(round(self.yellow_time / traci.simulation.getDeltaT())))
-                for _ in range(n_yellow):
-                    traci.simulationStep()
-
-            # 2) Nueva fase verde
-            traci.trafficlight.setPhase(self.tls_id, target_phase)
-
-        # Mantener la fase verde activa (evita que SUMO la avance sola al expirar)
+        """action: índice de fase (0..n_phases-1). Devuelve (state, reward, done, info)."""
+        traci.trafficlight.setPhase(self.tls_id, int(action))
         traci.trafficlight.setPhaseDuration(self.tls_id, 10000)
 
         for _ in range(self.sim_steps_per_action):
             traci.simulationStep()
 
-        self.episode_step += 1
-
-        next_state = self._get_state()
-        reward = self._get_reward()
-        done = (
-            traci.simulation.getTime() >= self.max_simulation_time
-            or traci.simulation.getMinExpectedNumber() <= 0
-        )
-        info = {"sim_time": traci.simulation.getTime()}
-
-        return next_state, reward, done, info
+        time = traci.simulation.getTime()
+        done = (time >= self.max_simulation_time
+                or traci.simulation.getMinExpectedNumber() <= 0)
+        return self._get_state(), self._get_reward(), done, {"sim_time": time}
 
     def close(self):
         self._disconnect()
 
     # ------------------------------------------------------------------
+    def _lane_occupancy(self, lane):
+        """Vehículos detenidos / capacidad del carril (0 a ~1)."""
+        slot = traci.lane.getLastStepLength(lane) + 2.5
+        capacity = traci.lane.getLength(lane) / slot
+        return traci.lane.getLastStepHaltingNumber(lane) / capacity
+
     def _get_state(self):
-        state = []
         phase = traci.trafficlight.getPhase(self.tls_id)
-        state.append(phase)
-        for lane in self.lanes:
-            vehicle_size_min_gap = traci.lane.getLastStepLength(lane) + 2.5
-            lane_length = traci.lane.getLength(lane)
-            queu = traci.lane.getLastStepHaltingNumber(lane) / (lane_length / vehicle_size_min_gap)
-            state.append(queu)
-        return np.array(state, dtype=np.float32)
+        queues = [self._lane_occupancy(l) for l in self.lanes]
+        return np.array([phase] + queues, dtype=np.float32)
 
     def _get_reward(self):
-        """Recompensa: negativo del promedio de ocupación por congestión
-        (vehículos detenidos / capacidad del carril), promediado entre carriles.
-        Queda en un rango aproximado de [-1, 0]."""
-        total = 0.0
-        for lane in self.lanes:
-            vehicle_size_min_gap = traci.lane.getLastStepLength(lane) + 2.5
-            lane_length = traci.lane.getLength(lane)
-            capacity = lane_length / vehicle_size_min_gap
-            total += traci.lane.getLastStepHaltingNumber(lane) / capacity
-        return -total / len(self.lanes)
+        """Negativo del promedio de ocupación entre carriles, en [-1, 0]."""
+        return -float(np.mean([self._lane_occupancy(l) for l in self.lanes]))
 
 
 # --------------------------------------------------------------------------
-# Ejemplo de uso con un agente aleatorio (reemplázalo por tu algoritmo de RL)
+# Ejemplo con política aleatoria
 # --------------------------------------------------------------------------
 if __name__ == "__main__":
     env = SumoEnv(
-        sumocfg_path="2way-single-intersection/single-intersection.sumocfg",  # <-- cambia esto por tu archivo
-        tls_id="t",                                   # <-- cambia esto por el id real
-        use_gui=False,
+        sumocfg_path="single-intersection/single-intersection.sumocfg",
+        tls_id="t",
+        use_gui=True,
         sim_steps_per_action=5,
         max_simulation_time=800,
-        yellow_time=3,
         gui_delay_ms=50,
     )
 
-    print(f"Fases verdes: {env.green_phases} | Acciones: {env.action_space_n}")
+    print(f"Fases: {env.n_phases} | Acciones: {env.action_space_n}")
+    for i, p in enumerate(env.logic):
+        print(f"  fase {i}: {p.state}  ({p.duration}s)")
     print(f"Carriles controlados: {env.lanes}")
 
-    n_episodes = 1
-    for ep in range(n_episodes):
-        state = env.reset()
-        done = False
-        total_reward = 0.0
+    state = env.reset()
+    done, total_reward = False, 0.0
+    while not done:
+        action = np.random.randint(env.action_space_n)
+        state, reward, done, info = env.step(action)
+        print(f"t={info['sim_time']:.0f}s | acción={action} | estado={state}")
+        total_reward += reward
 
-        for fase in env.logic:
-            print(f"\n{fase}")
-
-        print()
-        print(env.lanes)
-        
-        
-        while not done:
-            action = np.random.randint(env.action_space_n)  # política aleatoria
-            state, reward, done, info = env.step(action)
-            print(f"Tiempo: {info['sim_time']:.1f} s | Acción: {action} | Estado: {state}")
-            total_reward += reward
-
-        print(f"Episodio {ep + 1}: recompensa total = {total_reward:.2f}")
-    
+    print(f"Recompensa total: {total_reward:.2f}")
     env.close()

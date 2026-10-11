@@ -8,15 +8,19 @@ import numpy as np
 from funciones import train_episode_td, save_experiment
 import random
 
-actions = [0, 1, 2, 3]
+actions = list(range(0,8))
 
 states = [
-    (phase, s0, s1, s2, s3)
-    for phase in [0, 2, 4, 6]
+    (phase, s0, s1, s2, s3, s4, s5, s6, s7)
+    for phase in range(0,8)
     for s0 in range(1,6)
     for s1 in range(1,6)
     for s2 in range(1,6)
     for s3 in range(1,6)
+    for s4 in range(1,6)
+    for s5 in range(1,6)
+    for s6 in range(1,6)
+    for s7 in range(1,6)
 ]
 
 import yaml

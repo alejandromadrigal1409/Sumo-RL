@@ -2,44 +2,14 @@ import random
 
 def discretization(obs):
 
-    s0 = categorize((obs[1] + obs[2] / 2))
-    s1 = categorize((obs[3] + obs[4] / 2))
-    s2 = categorize((obs[5] + obs[6] / 2))
-    s3 = categorize((obs[7] + obs[8] / 2))
-
-    # ===== DISCRETE STATE =====
-    return (
-        obs[0],
-        s0,
-        s1,
-        s2,
-        s3
-    )
-
-def discretization_V2(obs):
-
-    s0 = categorize((obs[1] + obs[2] / 2))
-    s1 = categorize((obs[3] + obs[4] / 2))
-    s2 = categorize(obs[5])
-    s3 = categorize(obs[6])
-
-    # ===== DISCRETE STATE =====
-    return (
-        obs[0],
-        s0,
-        s1,
-        s2,
-        s3
-    )
-
-def discretization_V3(obs):
-
-    s0 = categorize((obs[1] + obs[2] / 2))
-    s1 = categorize((obs[3] + obs[4] / 2))
-    s2 = categorize(obs[5])
-    s3 = categorize(obs[6])
-    s4 = categorize(obs[7])
-    s5 = categorize(obs[8])
+    s0 = categorize(obs[1])
+    s1 = categorize(obs[2])
+    s2 = categorize(obs[3])
+    s3 = categorize(obs[4])
+    s4 = categorize(obs[5])
+    s5 = categorize(obs[6])
+    s6 = categorize(obs[7])
+    s7 = categorize(obs[8])
 
     # ===== DISCRETE STATE =====
     return (
@@ -49,8 +19,11 @@ def discretization_V3(obs):
         s2,
         s3,
         s4,
-        s5
+        s5,
+        s6,
+        s7
     )
+
 
 # ===== AUXILIARY FUNCTION =====
 def categorize(value):
