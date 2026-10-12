@@ -23,6 +23,9 @@ plt.plot(
         label="MC first visit"
     )
 '''
+
+plt.figure(figsize=(12, 5))
+
 plt.plot(
         np.mean(rewards_ev, axis = 0),
         label="MC every visit γ = 0.9, ε=0.1"
@@ -55,7 +58,7 @@ import os
 plt.savefig(
     "Learning_curves.png",
     dpi=300,
-    bbox_inches=None
+    bbox_inches='tight'
 )
 
 plt.close()
