@@ -23,20 +23,18 @@ def moving_average(x, window=20):
 
 
 paths = {
-    "p":           "Temporal_Difference/experiments/QL_experiment_2026-10-07_01-22-06/all_training_rewards_2026-10-07_01-22-06.pkl",
-    "p + s1":      "Temporal_Difference/experiments/QL_experiment_2026-10-08_03-51-10/all_training_rewards_2026-10-08_03-51-10.pkl",
-    "p + s1 + s2": "Temporal_Difference/experiments/QL_experiment_2026-10-07_19-40-46/all_training_rewards_2026-10-07_19-40-46.pkl",
+    "p": "Temporal_Difference/experiments/QL_experiment_2026-10-11_17-49-30/all_training_rewards_2026-10-11_17-49-30.pkl"
 }
 
-WINDOW = 5     # más alto = más liso (pero con más "retraso" visual)
-SHOW_BAND = True # False para ocultar la banda de ±1 std entre semillas
+WINDOW = 20     # más alto = más liso (pero con más "retraso" visual)
+SHOW_BAND = False # False para ocultar la banda de ±1 std entre semillas
 
 plt.figure(figsize=(10, 6))
 
 for label, path in paths.items():
     rewards = load_rewards(path)                 # (n_semillas, n_episodios)
-    mean_per_episode = rewards[:,:300].mean(axis=0)
-    std_per_episode = rewards[:,:300].std(axis=0)
+    mean_per_episode = rewards[:,:-1].mean(axis=0)
+    std_per_episode = rewards[:,:-1].std(axis=0)
 
     smoothed_mean = moving_average(mean_per_episode, WINDOW)
     smoothed_std = moving_average(std_per_episode, WINDOW)
