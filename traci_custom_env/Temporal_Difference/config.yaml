@@ -5,7 +5,7 @@ sumof_cfg: "2way-single-intersection/single-intersection.sumocfg"
 
 # ===== RL HYPERPARAMETERS =====
 gamma: 0.9
-episodes: 5000
+episodes: 1500
 epsilon_update_interval: 4
 alpha: 0.1
 
@@ -17,7 +17,7 @@ epsilon:
 
 # ===== TRAINING =====
 master_seed: 34
-num_trainings: 1
+num_trainings: 20
 
 # ===== TEMPORSAL DIFFERENCE =====
 method: "QL"
