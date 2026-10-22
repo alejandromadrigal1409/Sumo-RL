@@ -1,54 +1,24 @@
 import random
+import numpy as np
 
-def discretization(obs):
+def init_theta(n_actions, n_features):
+    return np.zeros((n_actions,n_features))
 
-    s0 = categorize(obs[1])
-    s1 = categorize(obs[2])
-    s2 = categorize(obs[3])
-    s3 = categorize(obs[4])
-    s4 = categorize(obs[5])
-    s5 = categorize(obs[6])
-    s6 = categorize(obs[7])
-    s7 = categorize(obs[8])
+def policy(theta, x):
+    h = theta @ x
+    e = np.exp(h - h.max())
+    return e / e.sum()
 
-    # ===== DISCRETE STATE =====
-    return (
-        obs[0],
-        s0,
-        s1,
-        s2,
-        s3,
-        s4,
-        s5,
-        s6,
-        s7
-    )
+def choose_action(theta, x):
+    preferences = policy(theta, x)
+    return np.random(len(preferences), p=preferences)
 
+def gradient_log_pi(theta, x, a):
+    preferences = policy(theta, x)
+    coef = -preferences
+    coef[a] += 1
+    return np.outer(coef,x)
 
-# ===== AUXILIARY FUNCTION =====
-def categorize(value):
-
-    if value < 0.2:
-        return 1
-    elif value < 0.4:
-        return 2
-    elif value < 0.6:
-        return 3
-    elif value < 0.8:
-        return 4
-    else:
-        return 5
-
-def choose_action(state, epsilon, actions, Q):
-    
-    if random.random() < epsilon:
-        return random.choice(actions)
-     
-    q_vals = [Q[(state,a)] for a in actions]
-    q_max = max(q_vals)
-
-    best_actions = [act for act in actions if Q[(state, act)] == q_max]
-    return random.choice(best_actions)
 
 def train_episode ():
     
