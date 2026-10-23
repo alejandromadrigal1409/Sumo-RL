@@ -20,7 +20,43 @@ def gradient_log_pi(theta, x, a):
     return np.outer(coef,x)
 
 
-def train_episode ():
+def generate_episode (env, theta, state):
+    episode = []
+
+    episode_reward = 0
+
+    done = False
+
+    while not done:
+
+        # select action
+        action = choose_action(theta, state)
+          
+        # execute action
+        next_state, reward, done, _ = env.step(action)
+
+        # save state, action and reward on this step
+        episode.append((state, action, reward))
+
+        episode_reward += reward
+
+        state = next_state
+
+    return episode, episode_reward
+
+def training(episode, theta, gamma, alpha):
+
+    G = 0
+    k = 0
+
+    for t, step in enumerate(episode):
+        s, a, r = step
+        G += r * gamma**(k-t-1)
+        k += 1
+        theta += alpha * gamma**(t) * G *gradient_log_pi(theta, s, a)
+
+    return theta
+
     
 from datetime import datetime
 import os
