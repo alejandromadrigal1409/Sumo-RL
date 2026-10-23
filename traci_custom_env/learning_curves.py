@@ -23,7 +23,7 @@ def moving_average(x, window=20):
 
 
 paths = {
-    "p": "Temporal_Difference/experiments/QL_experiment_2026-10-11_17-49-30/all_training_rewards_2026-10-11_17-49-30.pkl"
+    "p": "REINFORCE/experiments/REINFORCE_experiment_2026-10-23_13-02-52/all_training_rewards_2026-10-23_13-02-52.pkl"
 }
 
 WINDOW = 20     # más alto = más liso (pero con más "retraso" visual)
