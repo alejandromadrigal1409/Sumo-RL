@@ -1,0 +1,23 @@
+num_seconds: 5000
+sumocfg_path: ../simulations_files/2way-single-intersection/single-intersection.sumocfg
+tls_id: t
+cycles_per_action: 2
+warmup_cycles: 1
+delta: 5.0
+min_green: 10.0
+max_green: 120.0
+min_cycle: 40.0
+max_cycle: 300.0
+scale_min: 0.5
+scale_max: 1.5
+gamma: 0.9
+episodes: 1000
+alpha: 0.001
+master_seed: 1
+num_trainings: 5
+generated_seeds:
+- 17612
+- 74607
+- 8272
+- 33433
+- 15456

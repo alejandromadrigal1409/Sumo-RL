@@ -1,5 +1,5 @@
 # ===== ENVIRONMENT =====
-num_seconds: 3600
+num_seconds: 5000
 sumocfg_path: "../simulations_files/2way-single-intersection/single-intersection.sumocfg"
 tls_id: "t"
 cycles_per_action: 2
@@ -9,14 +9,14 @@ min_green: 10.0
 max_green: 120.0
 min_cycle: 40.0
 max_cycle: 300.0
-scale_min: 1.0      # demanda fija para esta prueba
-scale_max: 1.0
+scale_min: 0.5      # demanda fija para esta prueba
+scale_max: 1.5
 
 # ===== RL HYPERPARAMETERS =====
 gamma: 0.9
-episodes: 200
-alpha: 1.0e-2       # más alto para ver señal de aprendizaje rápido
+episodes: 1000
+alpha: 1.0e-3       # más alto para ver señal de aprendizaje rápido
 
 # ===== TRAINING =====
 master_seed: 1
-num_trainings: 2
+num_trainings: 5
