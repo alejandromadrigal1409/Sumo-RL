@@ -3,7 +3,7 @@ import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from sumo_rl_env import SumoEnv
+from sumo_rl_env_ciclo_variable import SumoEnv
 import numpy as np
 from funciones import generate_episode, save_experiment, init_theta, training
 import random
@@ -12,16 +12,13 @@ import yaml
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
+# ====== MAIN CODE =========
+
 gamma = config["gamma"]
 episodes = config["episodes"]
-num_seconds = config["num_seconds"]
-delta_time = config["delta_time"]
+alpha = config["alpha"]
 master_seed = config["master_seed"]
 num_trainings = config["num_trainings"]
-alpha = config["alpha"]
-sumof_cfg = config["sumof_cfg"]
-
-# ====== MAIN CODE =========
 
 random.seed(master_seed)
 
@@ -42,23 +39,29 @@ for seed in seeds:
 
     # creation of environment
     env = SumoEnv(
-        sumocfg_path=f"../simulations/{sumof_cfg}",  # <-- cambia esto por tu archivo
-        tls_id="t",                                   # <-- cambia esto por el id real
+        sumocfg_path=config["sumocfg_path"],
+        tls_id=config["tls_id"],
         use_gui=False,
-        sim_steps_per_action=delta_time,
-        max_simulation_time=num_seconds,
+        max_simulation_time=config["num_seconds"],
+        delta=config["delta"],
+        min_green=config["min_green"],
+        max_green=config["max_green"],
+        min_cycle=config["min_cycle"],
+        max_cycle=config["max_cycle"],
+        cycles_per_action=config["cycles_per_action"],
+        warmup_cycles=config["warmup_cycles"],
     )
 
     # initail theta
-    theta = init_theta(env.action_space_n, env.observation_space_shape[0])
+    theta = init_theta(env.action_space_n, env.observation_space_shape)
 
-    for episode in range(episodes):
+    for ep in range(episodes):
 
         # elige un factor de escala aleatorio para este episodio
-        scale_factor = random.uniform(0.1, 1.5)  # ej: entre 50% y 150% de la demanda base
+        scale_factor = random.uniform(config["scale_min"], config["scale_max"])
 
         # reset environment
-        obs = env.reset(seed=seed + episode, scale=scale_factor)
+        obs = env.reset(seed=seed + ep, scale=scale_factor)
 
         # initial state
         initial_state = obs
@@ -71,7 +74,6 @@ for seed in seeds:
         
         training_rewards.append(episode_reward)
   
-    # SEARCH FOR Q TO FIND BEST POLICY
     # gets the mean of final rewards of all episodes on training i      
     mean_training_reward = np.mean(training_rewards[-50:])
     

@@ -9,7 +9,7 @@ else:
     sys.exit("Por favor define la variable de entorno SUMO_HOME")
 
 # True = TraCI normal (permite sumo-gui) | False = libsumo (rápido, sin GUI)
-FORCE_TRACI = True
+FORCE_TRACI = False
 
 if FORCE_TRACI:
     import traci  # noqa: E402
@@ -28,7 +28,7 @@ class SumoEnv:
 
     - El orden de fases es el del programa del semáforo y nunca cambia.
     - Solo se modifican las fases VERDES; amarillos y todo-rojo quedan fijos.
-    - Una decisión por ciclo: al inicio de cada ciclo el agente suma o resta
+    - Una decisión por k ciclos: al inicio de cada ciclo el agente suma o resta
       `delta` segundos a una fase verde (o no cambia nada), y luego se
       simula el ciclo completo.
 
@@ -47,9 +47,11 @@ class SumoEnv:
         gui_delay_ms: int = 0,
         delta: float = 5.0,
         min_green: float = 10.0,
-        max_green: float = 150.0,
+        max_green: float = 120.0,
         min_cycle: float = 40.0,
         max_cycle: float = 300.0,
+        cycles_per_action: int = 4,
+        warmup_cycles: int = 0
     ):
         self.sumocfg_path = sumocfg_path
         self.tls_id = tls_id
@@ -61,6 +63,8 @@ class SumoEnv:
         self.max_green = max_green
         self.min_cycle = min_cycle
         self.max_cycle = max_cycle
+        self.cycles_per_action = cycles_per_action
+        self.warmup_cycles = warmup_cycles
 
         # Conexión de prueba para leer fases y carriles del semáforo.
         self._connect(gui=False)
@@ -80,8 +84,8 @@ class SumoEnv:
         self.base_durations = [float(p.duration) for p in self.logic.phases]
 
         self.action_space_n = 2 * len(self.green_phases) + 1
-        # Estado = [cola normalizada por carril] + [duración normalizada por verde]
-        self.observation_space_shape = (len(self.lanes) + len(self.green_phases),)
+        # Estado = [cola normalizada por carril] + [duración normalizada por verde] + sesgo
+        self.observation_space_shape = len(self.lanes) + len(self.green_phases) + 1
 
     # ------------------------------------------------------------------
     def _connect(self, seed: int = None, gui: bool = None, scale: float = None):
@@ -143,43 +147,52 @@ class SumoEnv:
         return self._get_state()
 
     def step(self, action: int):
-        """Aplica la acción y simula un ciclo completo.
+        """Aplica la acción y simula `cycles_per_action` ciclos completos.
 
-        Devuelve (state, reward, done, info). La recompensa es el promedio
-        de la recompensa por segundo durante el ciclo.
+        La recompensa es el promedio por segundo, ignorando los primeros
+        `warmup_cycles` ciclos (transitorio del cambio de plan).
         """
         self._apply_action(action)
         self._apply_logic()
 
-        rewards = []
-        left_phase_0 = False
+        rewards = []          # (índice de ciclo, recompensa)
+        cycles_done = 0
+        prev_phase = 0
         done = False
-        # Tope de seguridad por si el ciclo no se cierra.
-        for _ in range(int(self.max_cycle * 2)):
+        # Tope de seguridad: N ciclos de duración máxima + margen.
+        max_steps = int(self.max_cycle * self.cycles_per_action) + 10
+
+        for _ in range(max_steps):
             traci.simulationStep()
-            rewards.append(self._get_reward())
+            rewards.append((cycles_done, self._get_reward()))
 
             phase = traci.trafficlight.getPhase(self.tls_id)
-            if phase != 0:
-                left_phase_0 = True
-            elif left_phase_0:
-                break  # volvió a la fase 0: terminó el ciclo
+            if phase == 0 and prev_phase != 0:
+                cycles_done += 1          # se cerró un ciclo
+            prev_phase = phase
 
+            # Fin del episodio: NO quitar.
             time = traci.simulation.getTime()
             if (time >= self.max_simulation_time
                     or traci.simulation.getMinExpectedNumber() <= 0):
                 done = True
                 break
 
-        time = traci.simulation.getTime()
-        done = done or time >= self.max_simulation_time
+            if cycles_done >= self.cycles_per_action:
+                break
+
+        # Ignorar el transitorio si hay suficientes datos después de él.
+        useful = [r for c, r in rewards if c >= self.warmup_cycles]
+        reward = float(np.mean(useful if useful else [r for _, r in rewards]))
+
         info = {
-            "sim_time": time,
+            "sim_time": traci.simulation.getTime(),
             "cycle_length": self._cycle_length(),
+            "cycles_simulated": cycles_done,
             "green_durations": [self.logic.phases[i].duration
                                 for i in self.green_phases],
         }
-        return self._get_state(), float(np.mean(rewards)), done, info
+        return self._get_state(), reward, done, info
 
     def close(self):
         self._disconnect()
@@ -198,7 +211,7 @@ class SumoEnv:
         queues = [self._lane_occupancy(l) for l in self.lanes]
         greens = [self.logic.phases[i].duration / self.max_green
                   for i in self.green_phases]
-        return np.array(queues + greens, dtype=np.float32)
+        return np.array(queues + greens + [1.0], dtype=np.float32)
 
     def _get_reward(self):
         """Negativo del promedio de ocupación entre carriles, en [-1, 0]."""
@@ -210,10 +223,10 @@ class SumoEnv:
 # --------------------------------------------------------------------------
 if __name__ == "__main__":
     env = SumoEnv(
-        sumocfg_path="simulations/2way-single-intersection/single-intersection.sumocfg",
+        sumocfg_path="../simulations_files/2way-single-intersection/single-intersection.sumocfg",
         tls_id="t",
         use_gui=True,
-        max_simulation_time=800,
+        max_simulation_time=3000,
         gui_delay_ms=50,
     )
 
@@ -222,7 +235,6 @@ if __name__ == "__main__":
     for i, p in enumerate(env.logic.phases):
         print(f"  fase {i}: {p.state}  ({p.duration}s)")
     print(f"Carriles controlados: {env.lanes}")
-
     state = env.reset()
     done, total_reward = False, 0.0
    
@@ -230,7 +242,8 @@ if __name__ == "__main__":
         action = np.random.randint(env.action_space_n)
         state, reward, done, info = env.step(action)
         print(f"t={info['sim_time']:.0f}s | acción={action} | "
-              f"ciclo={info['cycle_length']:.0f}s | verdes={info['green_durations']} "
+              f"ciclo={info['cycle_length']:.0f}s | verdes={info['green_durations']} | "
+              f"estado = {state} "
               f"| r={reward:.3f}")
         total_reward += reward
 
