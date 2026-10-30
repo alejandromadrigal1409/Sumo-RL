@@ -1,5 +1,8 @@
-import random
 import numpy as np
+from datetime import datetime
+import os
+import matplotlib.pyplot as plt
+import pickle
 
 def init_theta(n_actions, n_features):
     return np.zeros((n_actions,n_features))
@@ -59,13 +62,6 @@ def training(episode, theta, gamma, alpha):
         theta += alpha * gamma**t * G_t * gradient_log_pi(theta, s, a)
 
     return theta
-
-    
-from datetime import datetime
-import os
-import matplotlib.pyplot as plt
-import pickle
-
 
 def save_experiment(
     reward_history,

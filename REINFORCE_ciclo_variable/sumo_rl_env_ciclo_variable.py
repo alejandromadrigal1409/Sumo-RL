@@ -85,7 +85,7 @@ class SumoEnv:
 
         self.action_space_n = 2 * len(self.green_phases) + 1
         # Estado = [cola normalizada por carril] + [duración normalizada por verde] + sesgo
-        self.observation_space_shape = len(self.lanes) + len(self.green_phases) + 1
+        self.observation_space_shape = len(self.lanes) + len(self.green_phases)
 
     # ------------------------------------------------------------------
     def _connect(self, seed: int = None, gui: bool = None, scale: float = None):
@@ -211,7 +211,7 @@ class SumoEnv:
         queues = [self._lane_occupancy(l) for l in self.lanes]
         greens = [self.logic.phases[i].duration / self.max_green
                   for i in self.green_phases]
-        return np.array(queues + greens + [1.0], dtype=np.float32)
+        return np.array(queues + greens, dtype=np.float32)
 
     def _get_reward(self):
         """Negativo del promedio de ocupación entre carriles, en [-1, 0]."""

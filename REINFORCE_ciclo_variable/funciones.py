@@ -58,8 +58,8 @@ def training(episode, theta, gamma, alpha):
     returns.reverse()                  # ahora returns[t] = G_t
 
     # Baseline: centrar y escalar los retornos
-    returns = np.array(returns)
-    returns = (returns - returns.mean()) / (returns.std() + 1e-8)
+    #returns = np.array(returns)
+    #returns = (returns - returns.mean()) / (returns.std() + 1e-8)
 
     # 2) actualización de theta, recorriendo hacia adelante
     for t, ((s, a, r), G_t) in enumerate(zip(episode, returns)):
