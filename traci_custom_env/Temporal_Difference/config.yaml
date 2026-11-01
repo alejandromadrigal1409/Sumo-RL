@@ -1,13 +1,13 @@
 # ===== ENVIRONMENT =====
-num_seconds: 2000
+num_seconds: 5000
 delta_time: 20
 sumof_cfg: "2way-single-intersection/single-intersection.sumocfg"
 
 # ===== RL HYPERPARAMETERS =====
 gamma: 0.9
-episodes: 100
+episodes: 1000
 epsilon_update_interval: 4
-alpha: 0.1
+alpha: 0.01
 
 # ===== EPSILON =====
 epsilon:
@@ -16,8 +16,8 @@ epsilon:
   decay: 0.95
 
 # ===== TRAINING =====
-master_seed: 34
-num_trainings: 1
+master_seed: 1
+num_trainings: 5
 
 # ===== TEMPORSAL DIFFERENCE =====
 method: "QL"
