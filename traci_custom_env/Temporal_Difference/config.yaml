@@ -1,7 +1,7 @@
 # ===== ENVIRONMENT =====
 num_seconds: 5000
 delta_time: 20
-sumof_cfg: "2way-single-intersection/single-intersection.sumocfg"
+sumof_cfg: "../../simulations_files/2way-single-intersection/single-intersection.sumocfg"
 
 # ===== RL HYPERPARAMETERS =====
 gamma: 0.9
