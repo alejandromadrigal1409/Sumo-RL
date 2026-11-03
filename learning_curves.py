@@ -23,7 +23,7 @@ def moving_average(x, window=20):
 
 
 paths = {
-    "Q-Learing": "traci_custom_env/Temporal_Difference/experiments/QL_experiment_2026-11-01_00-44-16/all_training_rewards_2026-11-01_00-44-16.pkl",
+    "Q-Learing": "traci_custom_env/Temporal_Difference/experiments/QL_experiment_2026-11-01_17-00-32/all_training_rewards_2026-11-01_17-00-32.pkl",
     "REINFORCE": "REINFORCE/experiments/REINFORCE_experiment_2026-10-23_13-02-52/all_training_rewards_2026-10-23_13-02-52.pkl"
 }
 
