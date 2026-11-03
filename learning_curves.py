@@ -23,8 +23,8 @@ def moving_average(x, window=20):
 
 
 paths = {
-    "Q-Learing": "traci_custom_env/Temporal_Difference/experiments/QL_experiment_2026-11-01_17-00-32/all_training_rewards_2026-11-01_17-00-32.pkl",
-    "REINFORCE": "REINFORCE/experiments/REINFORCE_experiment_2026-10-23_13-02-52/all_training_rewards_2026-10-23_13-02-52.pkl"
+    #"Q-Learing": "traci_custom_env/Temporal_Difference/experiments/QL_experiment_2026-11-01_17-00-32/all_training_rewards_2026-11-01_17-00-32.pkl",
+    "REINFORCE": "REINFORCE_ciclo_variable/experiments/REINFORCE_experiment_2026-11-02_22-19-46/all_training_rewards_2026-11-02_22-19-46.pkl"
 }
 
 WINDOW = 20     # más alto = más liso (pero con más "retraso" visual)
