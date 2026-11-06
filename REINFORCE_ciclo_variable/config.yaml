@@ -14,8 +14,8 @@ scale_max: 1.0
 
 # ===== RL HYPERPARAMETERS =====
 gamma: 0.9
-episodes: 1500
-alpha: 3.0e-2       # más alto para ver señal de aprendizaje rápido
+episodes: 4000
+alpha: 0.01       # más alto para ver señal de aprendizaje rápido
 
 # ===== TRAINING =====
 master_seed: 1
