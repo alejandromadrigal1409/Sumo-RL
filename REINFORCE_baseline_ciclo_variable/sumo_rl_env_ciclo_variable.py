@@ -51,7 +51,8 @@ class SumoEnv:
         min_cycle: float = 40.0,
         max_cycle: float = 300.0,
         cycles_per_action: int = 4,
-        warmup_cycles: int = 0
+        warmup_cycles: int = 0,
+        reward_scale: float = 10.0,
     ):
         self.sumocfg_path = sumocfg_path
         self.tls_id = tls_id
@@ -65,6 +66,7 @@ class SumoEnv:
         self.max_cycle = max_cycle
         self.cycles_per_action = cycles_per_action
         self.warmup_cycles = warmup_cycles
+        self.reward_scale = reward_scale
 
         # Conexión de prueba para leer fases y carriles del semáforo.
         self._connect(gui=False)
@@ -214,8 +216,13 @@ class SumoEnv:
         return np.array(queues + greens + [1], dtype=np.float32)
 
     def _get_reward(self):
+        '''
         """Negativo del promedio de ocupación entre carriles, en [-1, 0]."""
         return -float(np.mean([self._lane_occupancy(l) for l in self.lanes]))
+        '''
+        """Negativo del número total de vehículos detenidos, dividido entre una escala."""
+        halted = sum(traci.lane.getLastStepHaltingNumber(l) for l in self.lanes)
+        return -halted / self.reward_scale
 
 
 # --------------------------------------------------------------------------
