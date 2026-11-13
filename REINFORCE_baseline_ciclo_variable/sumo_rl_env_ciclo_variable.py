@@ -216,14 +216,14 @@ class SumoEnv:
         return np.array(queues + greens + [1], dtype=np.float32)
 
     def _get_reward(self):
-        
+        '''
         """Negativo del promedio de ocupación entre carriles, en [-1, 0]."""
         return -float(np.mean([self._lane_occupancy(l) for l in self.lanes]))
         '''
         """Negativo del número total de vehículos detenidos, dividido entre una escala."""
         halted = sum(traci.lane.getLastStepHaltingNumber(l) for l in self.lanes)
         return -halted / self.reward_scale
-        '''
+        
 
 
 # --------------------------------------------------------------------------
