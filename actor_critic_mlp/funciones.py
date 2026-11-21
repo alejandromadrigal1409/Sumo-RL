@@ -134,6 +134,36 @@ def save_waiting_time(all_training_waits, seeds, save_dir, method, timestamp):
     with open(pkl_path, "wb") as f:
         pickle.dump(all_training_waits, f)
 
+def save_metric(all_training_values, save_dir, method, timestamp,
+                name, ylabel, title):
+    """Grafica el promedio entre semillas de una métrica por episodio
+    y guarda los datos crudos en un .pkl.
+
+    all_training_values: una lista por entrenamiento (semilla), con un valor por episodio.
+    name:   nombre corto para los archivos (por ejemplo "travel_time").
+    ylabel: etiqueta del eje vertical.
+    title:  título de la gráfica.
+    """
+    values = np.array(all_training_values, dtype=float)   # (n_semillas, n_episodios)
+    mean = values.mean(axis=0)                             # promedio entre semillas
+    episodes = np.arange(len(mean))
+
+    plt.figure(figsize=(12, 6))
+    plt.plot(episodes, mean, label=title)
+    plt.xlabel("Episodes")
+    plt.ylabel(ylabel)
+    plt.title(f"{method} {title}")
+    plt.legend()
+    plt.grid(True)
+
+    plot_path = os.path.join(save_dir, f"{method}_{name}_{timestamp}.png")
+    plt.savefig(plot_path, dpi=300, bbox_inches="tight")
+    plt.close()
+
+    pkl_path = os.path.join(save_dir, f"all_training_{name}_{timestamp}.pkl")
+    with open(pkl_path, "wb") as f:
+        pickle.dump(all_training_values, f)
+
 def save_experiment(
     reward_history,
     all_training_rewards,
@@ -143,7 +173,11 @@ def save_experiment(
     base_dir="experiments",
     method="actor_critic",
     best_w=None,
-    all_training_waits=None
+    all_training_waits=None,
+    all_training_travel=None,
+    all_training_arrived=None,
+    all_training_co2=None,
+    all_training_nox=None
 ):
 
     # ===== CURRENT DATE/TIME =====
@@ -242,3 +276,30 @@ def save_experiment(
     # Save waiting time (gráfica + pkl), si se midió
     if all_training_waits is not None:
         save_waiting_time(all_training_waits, seeds, save_dir, method, timestamp)
+
+    # Save travel time (gráfica + pkl), si se midió
+    if all_training_travel is not None:
+        save_metric(all_training_travel, save_dir, method, timestamp,
+                    name="travel_time",
+                    ylabel="Tiempo de traslado promedio por vehículo (s)",
+                    title="Travel Time")
+
+    # Save vehículos que completaron su viaje (gráfica + pkl), si se midió
+    if all_training_arrived is not None:
+        save_metric(all_training_arrived, save_dir, method, timestamp,
+                    name="arrived",
+                    ylabel="Vehículos que completaron su viaje",
+                    title="Arrived Vehicles")
+
+    # Save emisiones (gráfica + pkl), si se midieron
+    if all_training_co2 is not None:
+        save_metric(all_training_co2, save_dir, method, timestamp,
+                    name="co2",
+                    ylabel="CO2 promedio por vehículo (g)",
+                    title="CO2 Emissions")
+
+    if all_training_nox is not None:
+        save_metric(all_training_nox, save_dir, method, timestamp,
+                    name="nox",
+                    ylabel="NOx promedio por vehículo (g)",
+                    title="NOx Emissions")

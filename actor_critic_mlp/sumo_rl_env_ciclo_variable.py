@@ -144,6 +144,11 @@ class SumoEnv:
         self._connect(seed=seed, scale=scale)
         self.ep_waiting_veh_s = 0.0   # vehículo-segundos de espera en el episodio
         self.ep_departed = 0          # vehículos que entraron a la red
+        self.depart_times = {}        # id del vehículo -> tiempo en que apareció
+        self.ep_travel_times = []     # tiempos de traslado de los viajes completados
+        self.ep_co2_mg = 0.0          # CO2 total emitido en el episodio (mg)
+        self.ep_nox_mg = 0.0          # NOx total emitido en el episodio (mg)
+
         # Restaurar el plan original para que cada episodio empiece igual.
         for p, d in zip(self.logic.phases, self.base_durations):
             p.duration = d
@@ -172,6 +177,21 @@ class SumoEnv:
             halted = sum(traci.lane.getLastStepHaltingNumber(l) for l in self.lanes)
             self.ep_waiting_veh_s += halted * dt
             self.ep_departed += traci.simulation.getDepartedNumber()
+            
+            # --- Tiempo de traslado ---
+            time_now = traci.simulation.getTime()
+            for veh_id in traci.simulation.getDepartedIDList():      # aparecieron en este paso
+                self.depart_times[veh_id] = time_now
+            for veh_id in traci.simulation.getArrivedIDList():       # salieron en este paso
+                t0 = self.depart_times.pop(veh_id, None)
+                if t0 is not None:
+                    self.ep_travel_times.append(time_now - t0)
+
+            # --- Emisiones (todos los vehículos en la red) ---
+            for veh_id in traci.vehicle.getIDList():
+                self.ep_co2_mg += traci.vehicle.getCO2Emission(veh_id) * dt   # mg/s * s = mg
+                self.ep_nox_mg += traci.vehicle.getNOxEmission(veh_id) * dt
+            
             rewards.append((cycles_done, self._get_reward()))
 
             phase = traci.trafficlight.getPhase(self.tls_id)
@@ -207,6 +227,24 @@ class SumoEnv:
         if self.ep_departed == 0:
             return 0.0
         return self.ep_waiting_veh_s / self.ep_departed
+
+    def get_episode_travel_time(self):
+        """Tiempo de traslado promedio (s) de los vehículos que completaron su viaje."""
+        if not self.ep_travel_times:
+            return 0.0
+        return float(np.mean(self.ep_travel_times))
+
+    def get_episode_arrived(self):
+        """Número de vehículos que completaron su viaje en el episodio."""
+        return len(self.ep_travel_times)
+
+    def get_episode_emissions(self):
+        """CO2 y NOx promedio por vehículo en el episodio, en gramos."""
+        if self.ep_departed == 0:
+            return 0.0, 0.0
+        co2_g = self.ep_co2_mg / 1000.0 / self.ep_departed
+        nox_g = self.ep_nox_mg / 1000.0 / self.ep_departed
+        return co2_g, nox_g
 
     def close(self):
         self._disconnect()

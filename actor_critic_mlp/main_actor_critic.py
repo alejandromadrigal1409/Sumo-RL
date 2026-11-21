@@ -33,6 +33,10 @@ seeds = random.sample(range(1, 100000), num_trainings)
 # List to save rewards of EVERY training
 all_training_rewards = []
 all_training_waits = [] 
+all_training_travel = []
+all_training_arrived = []
+all_training_co2 = []
+all_training_nox = []
 
 best_reward = -np.inf
 best_theta = None
@@ -45,6 +49,10 @@ for seed in seeds:
     # List to save the total reward of every episode on each training
     training_rewards = []
     training_waits = []
+    training_travel = []
+    training_arrived = []
+    training_co2 = []
+    training_nox = []
 
     # creation of environment
     env = SumoEnv(
@@ -90,6 +98,11 @@ for seed in seeds:
 
         training_rewards.append(episode_reward)
         training_waits.append(env.get_episode_waiting_time()) 
+        training_travel.append(env.get_episode_travel_time())
+        training_arrived.append(env.get_episode_arrived())
+        co2_g, nox_g = env.get_episode_emissions()
+        training_co2.append(co2_g)
+        training_nox.append(nox_g)
 
     # gets the mean of final rewards of all episodes on training i
     mean_training_reward = np.mean(training_rewards[-50:])
@@ -103,6 +116,10 @@ for seed in seeds:
     # matrix that saves final rewards for each episode for each training
     all_training_rewards.append(training_rewards)
     all_training_waits.append(training_waits)
+    all_training_travel.append(training_travel)
+    all_training_arrived.append(training_arrived)
+    all_training_co2.append(training_co2)
+    all_training_nox.append(training_nox)
 
     env.close()
 
@@ -113,6 +130,10 @@ save_experiment(
     reward_history=mean_all_training_rewards,
     all_training_rewards=all_training_rewards,
     all_training_waits=all_training_waits,
+    all_training_travel=all_training_travel,
+    all_training_arrived=all_training_arrived,
+    all_training_co2=all_training_co2,
+    all_training_nox=all_training_nox,
     best_theta=best_theta,
     config=config,
     seeds=seeds,
