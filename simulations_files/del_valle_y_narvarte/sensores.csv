@@ -1,0 +1,160 @@
+indice,calle,nombre,carriles,longitud_m
+0,1152832737#1,"Avenida Insurgentes Sur",3,54.6
+1,1152832737#2,"Avenida Insurgentes Sur",3,76.8
+2,1156978066#0,"Avenida Insurgentes Sur",3,69.0
+3,1156978067#1,"Avenida Insurgentes Sur",3,132.1
+4,1259593772#1,"Avenida División del Norte",2,63.3
+5,1259593772#2,"Avenida División del Norte",2,44.7
+6,24896323#1,"Rafaél Dondé",2,111.5
+7,337430638,"Avenida Insurgentes Sur",3,102.7
+8,434683856#0,"Calle Amores",3,129.9
+9,434683856#10,"Calle Amores",3,40.8
+10,434683856#2,"Calle Amores",3,86.0
+11,434683856#3,"Calle Amores",3,71.0
+12,434683856#6,"Calle Amores",3,41.6
+13,434683856#7,"Calle Amores",3,41.9
+14,4809129#6,"Calle Amores",4,59.8
+15,4809199#0,"Avenida Colonia del Valle",2,57.2
+16,4809199#1,"Avenida Colonia del Valle",2,123.6
+17,569075596#1,"Avenida Insurgentes Sur",3,169.4
+18,569075596#2,"Avenida Insurgentes Sur",3,73.0
+19,569075598#1,"Avenida Insurgentes Sur",3,101.8
+20,569075601#1,"Avenida Insurgentes Sur",3,117.4
+21,569075601#2,"Avenida Insurgentes Sur",3,74.6
+22,569075601#3,"Avenida Insurgentes Sur",3,41.7
+23,569075602#1,"Avenida Insurgentes Sur",3,48.5
+24,569075602#2,"Avenida Insurgentes Sur",3,57.0
+25,569075602#3,"Avenida Insurgentes Sur",3,54.9
+26,569075602#4,"Avenida Insurgentes Sur",3,70.1
+27,569075605#1,"Avenida Insurgentes Sur",3,226.2
+28,569075607#2,"Avenida Insurgentes Sur",3,78.1
+29,569075607#3,"Avenida Insurgentes Sur",3,91.0
+30,569075607#4,"Avenida Insurgentes Sur",3,61.9
+31,569075609#3,"Avenida Insurgentes Sur",3,51.4
+32,569075610#1,"Avenida Insurgentes Sur",3,202.1
+33,569075610#3,"Avenida Insurgentes Sur",3,48.4
+34,569075613#1,"Avenida Insurgentes Sur",3,129.6
+35,569075613#2,"Avenida Insurgentes Sur",3,50.6
+36,569075613#3-AddedOffRampEdge,"Avenida Insurgentes Sur",4,92.0
+37,569075613#3-AddedOnRampEdge,"Avenida Insurgentes Sur",4,92.0
+38,569075614#0,"Avenida Colonia del Valle",4,54.7
+39,569075614#1,"Avenida Colonia del Valle",4,48.7
+40,569075614#2,"Avenida Colonia del Valle",4,40.4
+41,569407360,"Xola",2,57.5
+42,569407361,"Xola",1,55.8
+43,569420025#1,"Avenida División del Norte",2,64.3
+44,569420025#3,"Avenida División del Norte",2,46.2
+45,569420025#4,"Avenida División del Norte",2,57.6
+46,569420028#0,"Avenida División del Norte",2,53.8
+47,569420028#1,"Avenida División del Norte",2,45.6
+48,569420028#2,"Avenida División del Norte",2,54.4
+49,569420029,"Avenida División del Norte",2,53.5
+50,569420031,"Avenida División del Norte",2,53.5
+51,569420036,"Avenida División del Norte",2,56.3
+52,569420038#0,"Avenida División del Norte",2,65.0
+53,569420039,"Avenida División del Norte",2,56.2
+54,569420043#2,"Avenida División del Norte",2,65.0
+55,569420046#0,"Avenida División del Norte",2,53.5
+56,569420046#1,"Avenida División del Norte",2,92.2
+57,569420050#0,"Avenida División del Norte",2,45.2
+58,569420050#2,"Avenida División del Norte",2,40.0
+59,569422234,"Avenida División del Norte",2,65.8
+60,569422235#0,"Avenida División del Norte",2,92.3
+61,569422235#1,"Avenida División del Norte",2,53.0
+62,569422235#2,"Avenida División del Norte",2,44.5
+63,569422235#3,"Avenida División del Norte",2,62.6
+64,569422237#1,"Gabriel Mancera",4,49.1
+65,569422237#2,"Gabriel Mancera",4,73.0
+66,569422237#3,"Gabriel Mancera",4,50.0
+67,569422243#0,"Avenida División del Norte",2,49.1
+68,569422246,"Avenida División del Norte",2,65.8
+69,569422254#1,"Avenida División del Norte",2,49.0
+70,569422259#1,"Avenida División del Norte",2,127.8
+71,569422262#4,"Avenida División del Norte",3,123.0
+72,569422287#11,"Ángel Urraza",5,43.8
+73,569422287#12,"Ángel Urraza",5,46.9
+74,569422287#13,"Ángel Urraza",5,80.7
+75,569422287#14,"Ángel Urraza",5,73.0
+76,569716833#0,"Avenida Eugenia",5,66.3
+77,569716833#1,"Avenida Eugenia",5,61.9
+78,569716833#3,"Avenida Eugenia",5,62.8
+79,569716833#4,"Avenida Eugenia",5,65.8
+80,569716833#6,"Avenida Eugenia",5,48.0
+81,617252023#0,"Avenida Cuauhtémoc",3,180.7
+82,617252023#2,"Avenida Cuauhtémoc",3,159.9
+83,617252023#3,"Avenida Cuauhtémoc",3,181.0
+84,617252023#4,"Avenida Cuauhtémoc",3,143.5
+85,617252023#5,"Avenida Cuauhtémoc",3,191.7
+86,617252032,"Avenida División del Norte",2,100.2
+87,617252034#0,"Avenida División del Norte",2,57.9
+88,617252037#1,"Avenida Colonia del Valle",4,85.6
+89,617252037#2,"Avenida Colonia del Valle",4,79.8
+90,617252037#3,"Avenida Colonia del Valle",4,90.1
+91,617260947#0,"Gabriel Mancera",4,45.4
+92,617260947#1,"Gabriel Mancera",4,74.2
+93,617281182#1,"Gabriel Mancera",4,42.6
+94,654760648#0,"Avenida Coyoacán",4,99.3
+95,654760648#1,"Avenida Coyoacán",4,145.5
+96,654760648#10,"Avenida Coyoacán",4,78.5
+97,654760648#4,"Avenida Coyoacán",4,83.3
+98,654760648#7,"Avenida Coyoacán",4,72.6
+99,654760648#8,"Avenida Coyoacán",4,74.1
+100,654763819#0,"Eugenia",4,59.9
+101,654763819#1,"Eugenia",4,63.6
+102,654763819#10,"Eugenia",4,98.2
+103,654763819#2,"Eugenia",4,63.3
+104,654763819#4,"Eugenia",4,43.1
+105,654763819#8,"Eugenia",4,55.1
+106,72050479#15,"Gabriel Mancera",4,70.0
+107,72050479#16,"Gabriel Mancera",4,106.8
+108,76403139,"Xola",2,62.4
+109,76406268#0,"Xola",1,140.9
+110,76406268#1,"Xola",1,86.0
+111,76406268#2,"Xola",1,50.2
+112,76406269#2,"Rafaél Dondé",1,155.2
+113,845666575,"Xola",2,140.7
+114,854203037#2,"Avenida División del Norte",4,89.2
+115,854204514#2,"Avenida División del Norte",2,67.7
+116,854210244#1,"Avenida Cuauhtémoc",3,251.2
+117,865136423#0,"Ángel Urraza",5,41.0
+118,865416031#0,"Avenida División del Norte",2,91.1
+119,903848449,"Xola",2,59.7
+120,903848450,"Xola",1,59.8
+121,903848451,"Xola",1,63.7
+122,903850317,"Xola",1,59.9
+123,903850318,"Xola",1,62.0
+124,903850319,"Xola",2,60.2
+125,903851347,"Xola",1,61.0
+126,903851348,"Xola",1,58.4
+127,903851351,"Xola",2,57.8
+128,903851352,"Xola",2,61.9
+129,903852228,"Xola",1,73.8
+130,903852231,"Xola",2,62.6
+131,904185982#0,"Gabriel Mancera",4,110.0
+132,904185982#1,"Gabriel Mancera",4,92.8
+133,904185983,"Xola",2,75.5
+134,904185984,"Xola",2,63.3
+135,904225338,"Avenida Eugenia",5,139.2
+136,918957870#1,"Avenida División del Norte",2,97.3
+137,918957870#3,"Avenida División del Norte",2,109.6
+138,918957872,"Avenida División del Norte",2,131.3
+139,918957874#0,"Gabriel Mancera",4,81.6
+140,918957874#1,"Gabriel Mancera",4,148.8
+141,918957875#0,"Gabriel Mancera",4,91.1
+142,918957875#1,"Gabriel Mancera",4,74.2
+143,918957875#2,"Gabriel Mancera",4,53.1
+144,918958781#1,"Avenida Cuauhtémoc",3,143.8
+145,918958781#2,"Avenida Cuauhtémoc",3,70.7
+146,918958782#0,"Avenida Cuauhtémoc",3,248.9
+147,918958782#1,"Avenida Cuauhtémoc",3,108.9
+148,918958782#2,"Avenida Cuauhtémoc",3,49.9
+149,921483348#0,"Ángel Urraza",5,64.8
+150,921483348#1,"Ángel Urraza",5,66.6
+151,921483348#2,"Ángel Urraza",5,91.8
+152,921483348#3,"Ángel Urraza",5,51.1
+153,921483348#4,"Ángel Urraza",5,67.3
+154,921483348#5,"Ángel Urraza",5,67.8
+155,921483348#6,"Ángel Urraza",5,68.1
+156,921513259,"Ángel Urraza",5,65.3
+157,958034542#2,"Ángel Urraza",5,70.5
+158,958034542#3,"Ángel Urraza",5,65.3
